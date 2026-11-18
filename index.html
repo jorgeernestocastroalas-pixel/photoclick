@@ -17,7 +17,7 @@
             padding-bottom: 140px;
         }
 
-        /* Header Fijo con Puntos y Botón de Cobrar */
+        /* Header Fijo Limpio */
         header {
             position: fixed;
             top: 0;
@@ -41,11 +41,6 @@
         .logo span {
             color: #ff3366;
         }
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
         .user-points-badge {
             font-size: 28px;
             font-weight: 800;
@@ -54,16 +49,6 @@
             padding: 6px 14px;
             border-radius: 10px;
             border: 1px solid #333;
-        }
-        .btn-withdraw {
-            background: #00c853;
-            color: #000;
-            border: none;
-            padding: 8px 16px;
-            font-size: 24px;
-            font-weight: 800;
-            border-radius: 10px;
-            cursor: pointer;
         }
 
         /* Contenedor Principal */
@@ -103,6 +88,31 @@
             margin-bottom: 8px;
         }
 
+        /* Buscador de Categorías en el Feed */
+        .search-bar-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .filter-btn {
+            background: #161616;
+            color: #aaa;
+            border: 1px solid #333;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .filter-btn.active {
+            background: #ff3366;
+            color: #fff;
+            border-color: #ff3366;
+        }
+
         /* Grid de 2 Columnas para el Feed (1x1 Estricto) */
         .feed-grid {
             display: grid;
@@ -130,7 +140,6 @@
             height: 100%;
             object-fit: cover;
         }
-        /* Marca de agua simulada en el feed */
         .watermark {
             position: absolute;
             bottom: 10px;
@@ -181,7 +190,7 @@
             justify-content: center;
         }
 
-        /* Ventana Modal de Foto (9x16) */
+        /* Ventana Modal de Foto (9x16) con Banner 320x50 */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -225,7 +234,7 @@
         .modal-image-box {
             width: 100%;
             aspect-ratio: 9 / 16;
-            max-height: 550px;
+            max-height: 420px;
             background: #222;
             position: relative;
             display: flex;
@@ -254,21 +263,22 @@
         .modal-title {
             font-size: 36px;
             font-weight: 800;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #fff;
         }
         .modal-actions {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+            margin-bottom: 15px;
         }
         .modal-btn {
-            padding: 14px 6px;
+            padding: 12px 4px;
             border-radius: 10px;
             border: 1px solid #333;
             background: #222;
             color: #fff;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             cursor: pointer;
             text-align: center;
@@ -279,7 +289,7 @@
             border: none;
         }
 
-        /* Ventana Modal Obligatoria de Anuncio con Banner 300x250 (30 Segundos) */
+        /* Ventana Modal Obligatoria de Anuncio (30 Segundos) */
         .ad-modal-overlay {
             display: none;
             position: fixed;
@@ -414,7 +424,19 @@
         .btn-membership {
             background: linear-gradient(135deg, #ffd700, #ff8f00);
             color: #000;
-            margin-bottom: 20px;
+            margin-top: 15px;
+        }
+        .btn-withdraw {
+            background: #00c853;
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            font-size: 28px;
+            font-weight: 800;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
         }
 
         /* Barra de Navegación Inferior Fija */
@@ -471,13 +493,10 @@
 </head>
 <body>
 
-    <!-- Header Fijo con Puntos y Botón de Cobrar -->
+    <!-- Header Fijo con Puntos -->
     <header>
         <div class="logo">PHOTO<span>CLICK</span></div>
-        <div class="header-right">
-            <button class="btn-withdraw" onclick="openWithdrawModal()">Cobrar</button>
-            <div class="user-points-badge" id="userPointsDisplay">⭐ 0 Pts</div>
-        </div>
+        <div class="user-points-badge" id="userPointsDisplay">⭐ 0 Pts</div>
     </header>
 
     <main>
@@ -488,13 +507,18 @@
                 <div class="ad-label">Publicidad</div>
             </div>
 
+            <!-- Buscador / Filtro de Categorías -->
+            <div class="search-bar-container" id="categoryFilterBar">
+                <button class="filter-btn active" onclick="filterCategory('Todas', this)">Todas</button>
+                <button class="filter-btn" onclick="filterCategory('Paisajes', this)">Paisajes</button>
+                <button class="filter-btn" onclick="filterCategory('Retratos', this)">Retratos</button>
+                <button class="filter-btn" onclick="filterCategory('Arte urbano', this)">Arte urbano</button>
+                <button class="filter-btn" onclick="filterCategory('Vehículos', this)">Vehículos</button>
+                <button class="filter-btn" onclick="filterCategory('Naturaleza', this)">Naturaleza</button>
+            </div>
+
             <!-- Grid de Feed (1x1) -->
             <div class="feed-grid" id="feedContainer"></div>
-
-            <!-- Banner Inferior 320x50 en el Feed -->
-            <div class="ad-wrapper" id="feedBottomAdSlot" style="margin-top: 25px;">
-                <div class="ad-label">Publicidad</div>
-            </div>
         </section>
 
         <!-- VISTA 2: PERFIL -->
@@ -506,20 +530,14 @@
                 <div class="ad-label">Publicidad</div>
             </div>
             
-            <!-- Bloque de Membresía: Acelera tus ganancias -->
-            <div class="profile-card" style="border: 2px solid #ffd700;">
-                <h3>Acelera tus ganancias ($5)</h3>
-                <p>• Beneficios: 10 fotos al día y 2 puntos por cada like sin ver anuncios.</p>
-                <button class="btn-action btn-membership" onclick="buyMembership()">Adquirir Membresía ($5)</button>
-            </div>
-
             <!-- Normas de Monetización -->
             <div class="profile-card">
                 <h3>Normas de Monetización</h3>
                 <p>• Visualización obligatoria de 30 segundos de anuncio antes de publicar.</p>
                 <p>• Límite máximo de 5 fotografías permitidas por día.</p>
-                <p>• Tiempo de espera de 30 minutos entre cada publicación.</p>
-                <p>• Ganancias divididas 50/50 en ventas de $1 a $5.</p>
+                <p>• Cada 500 likes acumulados representan $0.05 para tu saldo.</p>
+                <p>• Ganancias divididas 50/50 en ventas directas de $1 a $5.</p>
+                <button class="btn-withdraw" onclick="openWithdrawModal()">Solicitar Retiro (Mínimo $10 - USDT Binance)</button>
             </div>
 
             <!-- Formulario de Subida -->
@@ -550,6 +568,13 @@
 
                 <button class="btn-action" onclick="triggerAdBeforePublish()">Publicar Fotografía</button>
             </div>
+
+            <!-- Bloque de Membresía VIP hasta el final -->
+            <div class="profile-card" style="border: 2px solid #ffd700;">
+                <h3>Acelera tus ganancias ($5)</h3>
+                <p>• Beneficios: 10 fotos al día y 2 puntos por cada like sin ver anuncios (Plan VIP).</p>
+                <button class="btn-action btn-membership" onclick="buyMembership()">Adquirir Membresía VIP ($5)</button>
+            </div>
         </section>
     </main>
 
@@ -564,20 +589,24 @@
         </div>
     </div>
 
-    <!-- Ventana Modal de Foto / Interacción (9x16 con Marca de Agua) -->
+    <!-- Ventana Modal de Foto / Interacción (9x16 con Marca de Agua y Banner 320x50) -->
     <div class="modal-overlay" id="photoModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">×</button>
             <div class="modal-image-box" id="modalImageContainer">
                 <div class="modal-watermark">PHOTOCLICK</div>
             </div>
-            <div class="modal-details">
-                <div class="modal-title" id="modalPhotoTitle">Título de Foto</div>
+            <div class="modal-details" style="padding: 15px 20px;">
+                <div class="modal-title" id="modalPhotoTitle" style="font-size: 30px; margin-bottom: 10px;">Título de Foto</div>
                 <div class="modal-actions">
                     <button class="modal-btn" id="modalLikeBtn" onclick="toggleLike()">❤️ <span id="modalLikeCount">0</span></button>
                     <button class="modal-btn" onclick="alert('Sección de comentarios')">💬 Comentar</button>
                     <button class="modal-btn" onclick="alert('Enlace copiado para compartir')">🔗 Compartir</button>
                     <button class="modal-btn buy-btn" id="modalBuyBtn" onclick="buyPhotoModal()">Comprar $1</button>
+                </div>
+                <!-- Banner 320x50 Integrado en la Modal -->
+                <div class="ad-wrapper" id="modalAdSlot" style="margin-bottom: 0; padding: 8px;">
+                    <div class="ad-label" style="font-size: 10px; margin-bottom: 4px;">Publicidad</div>
                 </div>
             </div>
         </div>
@@ -613,8 +642,15 @@
 
     <script>
         let userPoints = 0;
-        let isVIP = false;
+        // Automatización de Membresía: Se guarda fecha de expiración en localStorage
+        let vipExpiration = localStorage.getItem('photoclick_vip_exp') ? parseInt(localStorage.getItem('photoclick_vip_exp')) : 0;
+        
+        function checkIsVIP() {
+            return Date.now() < vipExpiration;
+        }
+
         let photosData = [];
+        let currentFilter = 'Todas';
         let selectedPrice = 1;
         let currentModalIndex = null;
         let adInterval = null;
@@ -624,7 +660,7 @@
         }
 
         function injectAdsterraBanner(containerElement, width, height) {
-            containerElement.innerHTML = '';
+            containerElement.innerHTML = '<div class="ad-label">Publicidad</div>';
             const adBox = document.createElement('div');
             adBox.style.width = width + 'px';
             adBox.style.height = height + 'px';
@@ -662,7 +698,6 @@
 
         // Cargar banners iniciales
         injectAdsterraBanner(document.getElementById('topAdSlot'), 728, 90);
-        injectAdsterraBanner(document.getElementById('feedBottomAdSlot'), 320, 50);
         injectAdsterraBanner(document.getElementById('profileTopAdSlot'), 728, 90);
 
         function selectPrice(price, btn) {
@@ -672,8 +707,10 @@
         }
 
         function buyMembership() {
-            isVIP = true;
-            alert('¡Membresía VIP adquirida! Tienes 10 fotos al día y 2 puntos por like sin ver anuncios.');
+            // Automatización: Suma 30 días exactos al momento de compra
+            vipExpiration = Date.now() + (30 * 24 * 60 * 60 * 1000);
+            localStorage.setItem('photoclick_vip_exp', vipExpiration);
+            alert('¡Membresía VIP activada por 30 días! Las fotos activas y nuevas ganan 2 puntos por like y se acelera tu monetización.');
         }
 
         function openWithdrawModal() {
@@ -688,12 +725,19 @@
                 alert('Ingresa tu billetera o ID de Binance.');
                 return;
             }
-            if (userPoints < 100) { // Ejemplo de conversión 10 pts = $1 o mínimo $10
+            if (userPoints < 1000) { // Ejemplo operativo de retiro mínimo $10
                 alert('El retiro mínimo es de $10.00 (sistema Net 30). Acumula más puntos o ventas.');
                 return;
             }
             alert('¡Solicitud de retiro enviada con éxito bajo sistema Net 30 a tu billetera USDT!');
             closeWithdrawModal();
+        }
+
+        function filterCategory(category, btn) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderFeed();
         }
 
         function triggerAdBeforePublish() {
@@ -709,7 +753,8 @@
                 return;
             }
 
-            if (isVIP) {
+            // Si es VIP vigente, se salta el anuncio publicitario obligatorio de subida
+            if (checkIsVIP()) {
                 executePublish();
             } else {
                 openAdModal();
@@ -759,19 +804,25 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
+                // Automatización del ID y Plan de la foto según membresía vigente al momento exacto de subir
+                const isVipPhoto = checkIsVIP();
+                const photoPlanType = isVipPhoto ? 'membresia' : 'gratis';
+                const photoId = 'PHOTO_' + Date.now() + '_' + photoPlanType;
+
                 photosData.unshift({
-                    id: Date.now(),
+                    id: photoId,
                     title: titleInput.value.trim(),
                     category: catInput.value,
                     price: selectedPrice,
                     likes: 0,
+                    plan: photoPlanType,
                     imgSrc: e.target.result
                 });
                 titleInput.value = '';
                 fileInput.value = '';
                 renderFeed();
                 switchView('feed');
-                alert('¡Fotografía publicada con éxito!');
+                alert(`¡Fotografía publicada con éxito! (${photoPlanType.toUpperCase()})`);
             };
             reader.readAsDataURL(fileInput.files[0]);
         }
@@ -780,10 +831,16 @@
             const container = document.getElementById('feedContainer');
             container.innerHTML = '';
 
-            photosData.forEach((photo, index) => {
+            // Filtrar por categoría seleccionada
+            const filteredPhotos = photosData.filter(photo => {
+                if (currentFilter === 'Todas') return true;
+                return photo.category === currentFilter;
+            });
+
+            filteredPhotos.forEach((photo, index) => {
                 const card = document.createElement('div');
                 card.className = 'photo-card';
-                card.onclick = () => openModal(index);
+                card.onclick = () => openModal(photosData.indexOf(photo));
 
                 card.innerHTML = `
                     <div class="photo-container">
@@ -800,9 +857,8 @@
                 if ((index + 1) % 6 === 0) {
                     const adDiv = document.createElement('div');
                     adDiv.className = 'feed-ad-container';
-                    adDiv.innerHTML = `<div class="ad-label">Publicidad</div>`;
-                    container.appendChild(adDiv);
                     injectAdsterraBanner(adDiv, 728, 90);
+                    container.appendChild(adDiv);
                 }
             });
         }
@@ -819,6 +875,10 @@
             document.getElementById('modalPhotoTitle').textContent = photo.title;
             document.getElementById('modalLikeCount').textContent = photo.likes;
             document.getElementById('modalBuyBtn').textContent = `Comprar $${photo.price}`;
+            
+            // Cargar banner 320x50 dentro de la modal
+            injectAdsterraBanner(document.getElementById('modalAdSlot'), 320, 50);
+
             document.getElementById('photoModal').classList.add('open');
         }
 
@@ -833,10 +893,20 @@
 
         function toggleLike() {
             if (currentModalIndex !== null) {
-                photosData[currentModalIndex].likes++;
-                document.getElementById('modalLikeCount').textContent = photosData[currentModalIndex].likes;
-                userPoints += isVIP ? 2 : 1;
+                const photo = photosData[currentModalIndex];
+                photo.likes++;
+                document.getElementById('modalLikeCount').textContent = photo.likes;
+                
+                // Automatización de puntos según el plan con el que fue publicada la foto
+                // Si la foto es membresía, da 2 puntos; si es gratis, da 1 punto.
+                const pointsEarned = (photo.plan === 'membresia') ? 2 : 1;
+                userPoints += pointsEarned;
                 updatePointsDisplay();
+
+                // Notificación automática si alcanza la meta de monetización (500 likes = $0.05)
+                if (photo.likes === 500) {
+                    alert(`¡Felicidades! La foto "${photo.title}" alcanzó los 500 likes y ha sumado $0.05 a tu saldo de cobro.`);
+                }
             }
         }
 
