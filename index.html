@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- Vista tipo PC para que los banners 728x90 y textos a 40px no colapsen en móvil -->
+    <!-- Vista tipo PC para que los banners 728x90 y los textos grandes no colapsen -->
     <meta name="viewport" content="width=980">
     <title>Photoclick</title>
     <style>
@@ -18,7 +18,7 @@
             padding-bottom: 130px;
         }
 
-        /* Header Fijo Limpio */
+        /* Header Fijo Limpio con Contador de Puntos */
         header {
             position: fixed;
             top: 0;
@@ -42,6 +42,15 @@
         .logo span {
             color: #ff3366;
         }
+        .user-points-badge {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffd700;
+            background: #1e1e1e;
+            padding: 6px 16px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
 
         /* Contenedor Principal */
         main {
@@ -59,7 +68,7 @@
             display: block;
         }
 
-        /* Banner Superior Adsterra (728x90) */
+        /* Banners de Publicidad */
         .ad-wrapper {
             background: #121212;
             border: 1px solid #2a2a2a;
@@ -80,14 +89,13 @@
             margin-bottom: 8px;
         }
 
-        /* Grid de 2 Columnas para el Feed */
+        /* Grid de 2 Columnas para el Feed (1x1 Estricto) */
         .feed-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
 
-        /* Tarjeta de Foto */
         .photo-card {
             background: #161616;
             border-radius: 12px;
@@ -101,12 +109,7 @@
             width: 100%;
             aspect-ratio: 1 / 1;
             background: #1e1e1e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #444;
-            font-size: 24px;
-            font-weight: bold;
+            position: relative;
         }
         .photo-container img {
             width: 100%;
@@ -126,18 +129,17 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 72%;
+            max-width: 70%;
         }
         .photo-price-badge {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 800;
             color: #00e676;
             background: #102a1c;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 8px;
         }
 
-        /* Banner Adsterra Intercalado (Cada 6 fotos / 3 filas) */
         .feed-ad-container {
             grid-column: span 2;
             background: #121212;
@@ -152,7 +154,7 @@
             justify-content: center;
         }
 
-        /* Ventana Modal de Foto */
+        /* Ventana Modal de Foto y Compra */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -196,13 +198,11 @@
         .modal-image-box {
             width: 100%;
             aspect-ratio: 1 / 1;
-            max-height: 550px;
+            max-height: 500px;
             background: #222;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
-            color: #666;
         }
         .modal-image-box img {
             width: 100%;
@@ -229,7 +229,7 @@
             border: 1px solid #333;
             background: #222;
             color: #fff;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             cursor: pointer;
             text-align: center;
@@ -240,7 +240,57 @@
             border: none;
         }
 
-        /* Estilos del Perfil y Formulario de Subida */
+        /* Ventana Modal Obligatoria de Anuncio para Publicar (30s) */
+        .ad-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .ad-modal-overlay.open {
+            display: flex;
+        }
+        .ad-modal-content {
+            background: #161616;
+            border: 2px solid #ff3366;
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .ad-modal-title {
+            font-size: 34px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .ad-modal-timer {
+            font-size: 44px;
+            font-weight: 900;
+            color: #ff3366;
+            margin: 20px 0;
+        }
+        .ad-box-300x250 {
+            width: 300px;
+            height: 250px;
+            background: #222;
+            margin: 0 auto 20px auto;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+        }
+
+        /* Textos a 40px en Perfil y Controles */
         .profile-title {
             font-size: 44px;
             font-weight: 900;
@@ -256,14 +306,14 @@
             margin-bottom: 25px;
         }
         .profile-card h3 {
-            font-size: 32px;
+            font-size: 40px;
             color: #ff3366;
             margin-bottom: 15px;
         }
         .profile-card p {
-            font-size: 24px;
+            font-size: 40px;
             color: #ddd;
-            line-height: 1.5;
+            line-height: 1.4;
             margin-bottom: 12px;
         }
         .upload-box {
@@ -275,7 +325,7 @@
         }
         .upload-box label {
             display: block;
-            font-size: 28px;
+            font-size: 40px;
             font-weight: 700;
             margin-bottom: 10px;
             color: #fff;
@@ -283,7 +333,7 @@
         .upload-input {
             width: 100%;
             padding: 16px;
-            font-size: 26px;
+            font-size: 36px;
             background: #0b0b0b;
             border: 1px solid #333;
             border-radius: 10px;
@@ -298,7 +348,7 @@
         }
         .price-opt-btn {
             padding: 18px;
-            font-size: 30px;
+            font-size: 36px;
             font-weight: 800;
             background: #222;
             color: #fff;
@@ -318,10 +368,15 @@
             border: none;
             padding: 22px;
             border-radius: 12px;
-            font-size: 32px;
+            font-size: 40px;
             font-weight: 800;
             cursor: pointer;
             text-align: center;
+        }
+        .btn-membership {
+            background: linear-gradient(135deg, #ffd700, #ff8f00);
+            color: #000;
+            margin-bottom: 25px;
         }
 
         /* Barra de Navegación Inferior Fija */
@@ -378,20 +433,18 @@
 </head>
 <body>
 
-    <!-- Header Fijo Limpio -->
+    <!-- Header Fijo Limpio con Puntos -->
     <header>
         <div class="logo">PHOTO<span>CLICK</span></div>
+        <div class="user-points-badge" id="userPointsDisplay">⭐ 0 Pts</div>
     </header>
 
     <main>
         <!-- VISTA 1: FEED (HOME) -->
         <section id="view-feed" class="view-section active">
-            <!-- Banner Superior Adsterra (728x90) -->
             <div class="ad-wrapper" id="topAdSlot">
                 <div class="ad-label">Publicidad</div>
             </div>
-
-            <!-- Cuadrícula del Feed -->
             <div class="feed-grid" id="feedContainer"></div>
         </section>
 
@@ -399,6 +452,14 @@
         <section id="view-profile" class="view-section">
             <div class="profile-title">Mi Perfil</div>
             
+            <!-- Botón de Membresía VIP ($5) -->
+            <div class="profile-card" style="border: 2px solid #ffd700;">
+                <h3>Membresía VIP ($5)</h3>
+                <p>• ¿Quieres ganar más? Paga $5.</p>
+                <p>• Beneficios: 10 fotos al día y 2 puntos por cada like sin ver anuncios.</p>
+                <button class="btn-action btn-membership" onclick="buyMembership()">Adquirir Membresía ($5)</button>
+            </div>
+
             <div class="profile-card">
                 <h3>Normas de Monetización</h3>
                 <p>• Visualización obligatoria de 30 segundos de anuncio antes de publicar.</p>
@@ -407,10 +468,19 @@
                 <p>• Ganancias divididas 50/50 en ventas de $1 a $5.</p>
             </div>
 
-            <!-- Formulario para subir foto y elegir precio ($1 a $5) -->
+            <!-- Formulario de Subida con Categorías y Precios ($1 a $5) -->
             <div class="upload-box">
                 <label>Título de la fotografía:</label>
                 <input type="text" id="photoTitleInput" class="upload-input" placeholder="Escribe un título corto...">
+
+                <label>Selecciona la Categoría:</label>
+                <select id="photoCategoryInput" class="upload-input">
+                    <option value="Paisajes">Paisajes</option>
+                    <option value="Retratos">Retratos</option>
+                    <option value="Arte urbano">Arte urbano</option>
+                    <option value="Vehículos">Vehículos</option>
+                    <option value="Naturaleza">Naturaleza</option>
+                </select>
 
                 <label>Selecciona el archivo de imagen:</label>
                 <input type="file" id="photoFileInput" class="upload-input" accept="image/*">
@@ -424,17 +494,29 @@
                     <button type="button" class="price-opt-btn" onclick="selectPrice(5, this)">$5</button>
                 </div>
 
-                <button class="btn-action" onclick="publishPhoto()">Publicar Fotografía</button>
+                <button class="btn-action" onclick="triggerAdBeforePublish()">Publicar Fotografía</button>
             </div>
 
-            <!-- Banner 320x50 en Perfil -->
             <div class="ad-wrapper" id="profileAdSlot">
                 <div class="ad-label">Publicidad</div>
             </div>
         </section>
     </main>
 
-    <!-- Ventana Modal de Fotografía -->
+    <!-- Ventana Modal Obligatoria de Anuncio (30 Segundos) -->
+    <div class="ad-modal-overlay" id="adModalOverlay">
+        <div class="ad-modal-content">
+            <div class="ad-modal-title">Visualizando Anuncio Requerido</div>
+            <p style="font-size: 24px; color: #aaa; margin-bottom: 10px;">Debes ver el anuncio completo para poder publicar</p>
+            <div class="ad-box-300x250" id="ad300x250Container">
+                <span>Anuncio 300x250</span>
+            </div>
+            <div class="ad-modal-timer" id="adTimerDisplay">30</div>
+            <button class="btn-action" id="adFinishBtn" disabled style="background: #444; cursor: not-allowed;" onclick="finishAdAndPublish()">Espera el contador...</button>
+        </div>
+    </div>
+
+    <!-- Ventana Modal de Foto / Interacción -->
     <div class="modal-overlay" id="photoModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">×</button>
@@ -467,7 +549,17 @@
     </nav>
 
     <script>
-        // Función real de inyección DOM para que los scripts de Adsterra sí se ejecuten
+        let userPoints = 0;
+        let isVIP = false;
+        let photosData = []; // Sin placeholders al inicio
+        let selectedPrice = 1;
+        let currentModalIndex = null;
+        let adInterval = null;
+
+        function updatePointsDisplay() {
+            document.getElementById('userPointsDisplay').textContent = `⭐ ${userPoints} Pts`;
+        }
+
         function injectAdsterraBanner(containerElement, width, height) {
             const adBox = document.createElement('div');
             adBox.style.width = width + 'px';
@@ -504,22 +596,9 @@
             doc.close();
         }
 
-        // Cargar banners fijos iniciales (Header 728x90 y Perfil 320x50)
+        // Cargar banners iniciales
         injectAdsterraBanner(document.getElementById('topAdSlot'), 728, 90);
         injectAdsterraBanner(document.getElementById('profileAdSlot'), 320, 50);
-
-        // Estado de fotografías (sin imágenes externas inventadas)
-        let photosData = [
-            { id: 1, title: "Espacio Foto 1", price: 1, likes: 0, imgSrc: null },
-            { id: 2, title: "Espacio Foto 2", price: 2, likes: 0, imgSrc: null },
-            { id: 3, title: "Espacio Foto 3", price: 1, likes: 0, imgSrc: null },
-            { id: 4, title: "Espacio Foto 4", price: 3, likes: 0, imgSrc: null },
-            { id: 5, title: "Espacio Foto 5", price: 5, likes: 0, imgSrc: null },
-            { id: 6, title: "Espacio Foto 6", price: 2, likes: 0, imgSrc: null }
-        ];
-
-        let selectedPrice = 1;
-        let currentModalIndex = null;
 
         function selectPrice(price, btn) {
             selectedPrice = price;
@@ -527,30 +606,93 @@
             btn.classList.add('selected');
         }
 
-        function publishPhoto() {
+        function buyMembership() {
+            isVIP = true;
+            alert('¡Membresía VIP adquirida con éxito! Ahora tienes 10 fotos al día y ganas 2 puntos por like sin ver anuncios.');
+        }
+
+        // Paso 1: Al dar clic en publicar, se abre la ventana modal de 30 segundos obligatorios (si no es VIP o según regla)
+        function triggerAdBeforePublish() {
             const titleInput = document.getElementById('photoTitleInput');
             const fileInput = document.getElementById('photoFileInput');
-            const title = titleInput.value.trim() || "Nueva Foto";
 
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    photosData.unshift({
-                        id: Date.now(),
-                        title: title,
-                        price: selectedPrice,
-                        likes: 0,
-                        imgSrc: e.target.result
-                    });
-                    titleInput.value = '';
-                    fileInput.value = '';
-                    renderFeed();
-                    switchView('feed');
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                alert('Selecciona una imagen de tu galería primero.');
+            if (!titleInput.value.trim()) {
+                alert('Escribe un título para la fotografía.');
+                return;
             }
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Selecciona una imagen de tu galería.');
+                return;
+            }
+
+            // Si es VIP, puede saltarse el anuncio o verlo directo. Si no, activamos modal obligatorio de 30s.
+            if (isVIP) {
+                executePublish();
+            } else {
+                openAdModal();
+            }
+        }
+
+        function openAdModal() {
+            const modal = document.getElementById('adModalOverlay');
+            modal.classList.add('open');
+
+            // Cargar banner 300x250 dentro de la modal de anuncio
+            const adContainer = document.getElementById('ad300x250Container');
+            adContainer.innerHTML = '';
+            injectAdsterraBanner(adContainer, 300, 250);
+
+            let timeLeft = 30;
+            const timerDisplay = document.getElementById('adTimerDisplay');
+            const finishBtn = document.getElementById('adFinishBtn');
+            timerDisplay.textContent = timeLeft;
+            finishBtn.disabled = true;
+            finishBtn.style.background = '#444';
+            finishBtn.style.cursor = 'not-allowed';
+            finishBtn.textContent = 'Espera el contador...';
+
+            if (adInterval) clearInterval(adInterval);
+
+            adInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(adInterval);
+                    finishBtn.disabled = false;
+                    finishBtn.style.background = '#ff3366';
+                    finishBtn.style.cursor = 'pointer';
+                    finishBtn.textContent = 'Continuar Publicación';
+                }
+            }, 1000);
+        }
+
+        function finishAdAndPublish() {
+            document.getElementById('adModalOverlay').classList.remove('open');
+            executePublish();
+        }
+
+        function executePublish() {
+            const titleInput = document.getElementById('photoTitleInput');
+            const catInput = document.getElementById('photoCategoryInput');
+            const fileInput = document.getElementById('photoFileInput');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photosData.unshift({
+                    id: Date.now(),
+                    title: titleInput.value.trim(),
+                    category: catInput.value,
+                    price: selectedPrice,
+                    likes: 0,
+                    imgSrc: e.target.result
+                });
+                titleInput.value = '';
+                fileInput.value = '';
+                renderFeed();
+                switchView('feed');
+                alert('¡Fotografía publicada con éxito!');
+            };
+            reader.readAsDataURL(fileInput.files[0]);
         }
 
         function renderFeed() {
@@ -562,12 +704,10 @@
                 card.className = 'photo-card';
                 card.onclick = () => openModal(index);
 
-                const imgHtml = photo.imgSrc 
-                    ? `<img src="${photo.imgSrc}" alt="${photo.title}">` 
-                    : `<span>Sin imagen</span>`;
-
                 card.innerHTML = `
-                    <div class="photo-container">${imgHtml}</div>
+                    <div class="photo-container">
+                        <img src="${photo.imgSrc}" alt="${photo.title}">
+                    </div>
                     <div class="photo-info">
                         <span class="photo-title">${photo.title}</span>
                         <span class="photo-price-badge">$${photo.price}</span>
@@ -575,7 +715,7 @@
                 `;
                 container.appendChild(card);
 
-                // Inyección real del banner de Adsterra cada 6 fotografías (cada 3 filas)
+                // Inyección real del banner de Adsterra cada 6 fotos (3 filas)
                 if ((index + 1) % 6 === 0) {
                     const adDiv = document.createElement('div');
                     adDiv.className = 'feed-ad-container';
@@ -590,9 +730,7 @@
             currentModalIndex = index;
             const photo = photosData[index];
             const imgBox = document.getElementById('modalImageContainer');
-            imgBox.innerHTML = photo.imgSrc 
-                ? `<img src="${photo.imgSrc}" alt="${photo.title}">` 
-                : `<span>Sin imagen cargada</span>`;
+            imgBox.innerHTML = `<img src="${photo.imgSrc}" alt="${photo.title}">`;
 
             document.getElementById('modalPhotoTitle').textContent = photo.title;
             document.getElementById('modalLikeCount').textContent = photo.likes;
@@ -608,6 +746,10 @@
             if (currentModalIndex !== null) {
                 photosData[currentModalIndex].likes++;
                 document.getElementById('modalLikeCount').textContent = photosData[currentModalIndex].likes;
+                
+                // Sumar puntos por like (1 normal, 2 si es VIP)
+                userPoints += isVIP ? 2 : 1;
+                updatePointsDisplay();
             }
         }
 
