@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photoclick - Feed</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #0b0b0b;
+            color: #ffffff;
+            padding-bottom: 80px;
+        }
+
+        /* Header Fijo con Respiro (Elegante y Flotante) */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #121212;
+            border-bottom: 1px solid #1f1f1f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            z-index: 1000;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+        }
+        .logo span {
+            color: #ff3366;
+        }
+        .user-stats {
+            font-size: 12px;
+            background: #1a1a1a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            color: #ddd;
+        }
+
+        /* Contenedor Principal con Margen Superior para el Header */
+        main {
+            margin-top: 75px;
+            padding: 12px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Banner Superior Fijo (Debajo del Header con separación limpia) */
+        .top-ad-wrapper {
+            background: #121212;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .ad-label {
+            font-size: 9px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        /* Grid de 2 Columnas para el Feed */
+        .feed-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        /* Tarjeta de Foto (Estricta 1:1) */
+        .photo-card {
+            background: #161616;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+        }
+        .photo-container {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #222;
+            position: relative;
+        }
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .photo-info {
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #aaa;
+        }
+        .photo-title {
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+
+        /* Contenedor de Banner Adsterra Intercalado en el Feed */
+        .feed-ad-container {
+            grid-column: span 2;
+            background: #121212;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            margin: 6px 0;
+        }
+
+        /* Adaptabilidad de los iframes de Adsterra para móviles */
+        iframe {
+            max-width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Fijo -->
+    <header>
+        <div class="logo">PHOTO<span>CLICK</span></div>
+        <div class="user-stats">⭐ 0 Pts</div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main>
+        
+        <!-- Banner Superior Adsterra (728x90 con su respectiva llave) -->
+        <div class="top-ad-wrapper">
+            <div class="ad-label">Publicidad</div>
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '94a60368d80726e04cbdceea35d7410e',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
+        </div>
+
+        <!-- Cuadrícula del Feed -->
+        <div class="feed-grid" id="feedContainer">
+            <!-- Las fotos se inyectan dinámicamente aquí -->
+        </div>
+    </main>
+
+    <script>
+        // Mock de prueba para verificar filas y columnas
+        const samplePhotos = [
+            { title: "Atardecer urbano", url: "https://picsum.photos/seed/p1/500/500" },
+            { title: "Moda y estilo", url: "https://picsum.photos/seed/p2/500/500" },
+            { title: "Naturaleza viva", url: "https://picsum.photos/seed/p3/500/500" },
+            { title: "Café matutino", url: "https://picsum.photos/seed/p4/500/500" },
+            { title: "Arquitectura", url: "https://picsum.photos/seed/p5/500/500" },
+            { title: "Paisaje abierto", url: "https://picsum.photos/seed/p6/500/500" },
+            { title: "Vehículo en ruta", url: "https://picsum.photos/seed/p7/500/500" },
+            { title: "Tecnología", url: "https://picsum.photos/seed/p8/500/500" },
+            { title: "Luna llena", url: "https://picsum.photos/seed/p9/500/500" },
+            { title: "Estilo minimal", url: "https://picsum.photos/seed/p10/500/500" },
+            { title: "Calle principal", url: "https://picsum.photos/seed/p11/500/500" },
+            { title: "Arte visual", url: "https://picsum.photos/seed/p12/500/500" }
+        ];
+
+        function renderFeed() {
+            const container = document.getElementById('feedContainer');
+            let html = '';
+
+            samplePhotos.forEach((photo, index) => {
+                html += `
+                    <div class="photo-card">
+                        <div class="photo-container">
+                            <img src="${photo.url}" alt="${photo.title}" loading="lazy">
+                        </div>
+                        <div class="photo-info">
+                            <span class="photo-title">${photo.title}</span>
+                            <span>❤️ 0</span>
+                        </div>
+                    </div>
+                `;
+
+                // Inserción exacta del banner 728x90 cada 6 fotos (3 filas)
+                if ((index + 1) % 6 === 0) {
+                    html += `
+                        <div class="feed-ad-container">
+                            <div class="ad-label">Publicidad</div>
+                            <script type="text/javascript">
+                                atOptions = {
+                                    'key' : '94a60368d80726e04cbdceea35d7410e',
+                                    'format' : 'iframe',
+                                    'height' : 90,
+                                    'width' : 728,
+                                    'params' : {}
+                                };
+                            </script>
+                            <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+        }
+
+        renderFeed();
+    </script>
+</body>
+</html>
