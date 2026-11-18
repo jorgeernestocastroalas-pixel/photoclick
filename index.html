@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- Forzamos la escala y zoom para mantener proporción limpia tipo escritorio/móvil estable -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Vista tipo PC para que los banners 728x90 y textos a 40px no colapsen en móvil -->
+    <meta name="viewport" content="width=980">
     <title>Photoclick</title>
     <style>
         * {
@@ -15,7 +15,7 @@
         body {
             background-color: #0b0b0b;
             color: #ffffff;
-            padding-bottom: 90px;
+            padding-bottom: 130px;
         }
 
         /* Header Fijo Limpio */
@@ -25,17 +25,17 @@
             left: 0;
             width: 100%;
             background: #121212;
-            border-bottom: 1px solid #1f1f1f;
+            border-bottom: 2px solid #222;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 20px;
+            padding: 20px 30px;
             z-index: 1000;
         }
         .logo {
-            font-size: 40px; /* Título principal a 40px como se solicitó */
-            font-weight: 800;
-            letter-spacing: 1.5px;
+            font-size: 46px;
+            font-weight: 900;
+            letter-spacing: 2px;
             color: #ffffff;
             line-height: 1;
         }
@@ -45,14 +45,13 @@
 
         /* Contenedor Principal */
         main {
-            margin-top: 85px;
-            padding: 12px;
-            max-width: 600px;
+            margin-top: 110px;
+            padding: 20px;
+            max-width: 920px;
             margin-left: auto;
             margin-right: auto;
         }
 
-        /* Secciones de Vistas (Módulos) */
         .view-section {
             display: none;
         }
@@ -61,44 +60,53 @@
         }
 
         /* Banner Superior Adsterra (728x90) */
-        .top-ad-wrapper {
+        .ad-wrapper {
             background: #121212;
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 10px;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 15px;
             text-align: center;
-            margin-bottom: 15px;
-            overflow-x: auto;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .ad-label {
-            font-size: 10px;
-            color: #555;
+            font-size: 14px;
+            color: #666;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
         }
 
         /* Grid de 2 Columnas para el Feed */
         .feed-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 20px;
         }
 
-        /* Tarjeta de Foto (1:1 Proporcional) */
+        /* Tarjeta de Foto */
         .photo-card {
             background: #161616;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            border: 1px solid #222;
+            border: 1px solid #2a2a2a;
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
         .photo-container {
             width: 100%;
             aspect-ratio: 1 / 1;
-            background: #1a1a1a;
-            position: relative;
+            background: #1e1e1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+            font-size: 24px;
+            font-weight: bold;
         }
         .photo-container img {
             width: 100%;
@@ -106,88 +114,214 @@
             object-fit: cover;
         }
         .photo-info {
-            padding: 8px;
+            padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
-            color: #ccc;
         }
         .photo-title {
-            font-weight: 500;
-            color: #fff;
+            font-size: 40px;
+            font-weight: 700;
+            color: #ffffff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 75%;
+            max-width: 72%;
+        }
+        .photo-price-badge {
+            font-size: 32px;
+            font-weight: 800;
+            color: #00e676;
+            background: #102a1c;
+            padding: 4px 12px;
+            border-radius: 8px;
         }
 
         /* Banner Adsterra Intercalado (Cada 6 fotos / 3 filas) */
         .feed-ad-container {
             grid-column: span 2;
             background: #121212;
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 10px;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 15px;
             text-align: center;
-            margin: 8px 0;
-            overflow-x: auto;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Estilos del Perfil */
-        .profile-container {
-            padding: 20px 10px;
+        /* Ventana Modal de Foto */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-content {
+            background: #161616;
+            border: 2px solid #333;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 820px;
+            overflow: hidden;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #ff3366;
+            color: #fff;
+            border: none;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .modal-image-box {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-height: 550px;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #666;
+        }
+        .modal-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .modal-details {
+            padding: 25px;
+        }
+        .modal-title {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .modal-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .modal-btn {
+            padding: 18px 10px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            background: #222;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            cursor: pointer;
             text-align: center;
         }
+        .modal-btn.buy-btn {
+            background: #00c853;
+            color: #000;
+            border: none;
+        }
+
+        /* Estilos del Perfil y Formulario de Subida */
         .profile-title {
-            font-size: 40px; /* Título principal de sección a 40px */
-            font-weight: 800;
-            margin-bottom: 15px;
+            font-size: 44px;
+            font-weight: 900;
+            margin-bottom: 20px;
             color: #fff;
+            text-align: center;
         }
         .profile-card {
             background: #161616;
-            border: 1px solid #222;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: left;
-            margin-bottom: 20px;
+            border: 1px solid #2a2a2a;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 25px;
         }
         .profile-card h3 {
-            font-size: 18px;
+            font-size: 32px;
             color: #ff3366;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         .profile-card p {
-            font-size: 13px;
-            color: #bbb;
+            font-size: 24px;
+            color: #ddd;
             line-height: 1.5;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        .upload-box {
+            background: #161616;
+            border: 1px solid #2a2a2a;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .upload-box label {
+            display: block;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .upload-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 26px;
+            background: #0b0b0b;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .price-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .price-opt-btn {
+            padding: 18px;
+            font-size: 30px;
+            font-weight: 800;
+            background: #222;
+            color: #fff;
+            border: 2px solid #333;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .price-opt-btn.selected {
+            background: #ff3366;
+            border-color: #ff3366;
         }
         .btn-action {
             display: block;
             width: 100%;
             background: #ff3366;
-            color: #white;
+            color: #fff;
             border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 700;
+            padding: 22px;
+            border-radius: 12px;
+            font-size: 32px;
+            font-weight: 800;
             cursor: pointer;
-            margin-top: 15px;
             text-align: center;
-        }
-
-        /* Banner 320x50 para Perfil */
-        .profile-ad-wrapper {
-            background: #121212;
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            margin-top: 20px;
-            overflow-x: auto;
         }
 
         /* Barra de Navegación Inferior Fija */
@@ -197,76 +331,64 @@
             left: 0;
             width: 100%;
             background: #121212;
-            border-top: 1px solid #1f1f1f;
+            border-top: 2px solid #222;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 10px 0;
+            padding: 15px 0;
             z-index: 1000;
         }
         .nav-item {
             background: none;
             border: none;
             color: #888;
-            font-size: 12px;
+            font-size: 22px;
+            font-weight: 700;
             display: flex;
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            gap: 4px;
+            gap: 6px;
         }
         .nav-item.active {
             color: #ff3366;
         }
         .nav-item svg {
-            width: 24px;
-            height: 24px;
+            width: 40px;
+            height: 40px;
             fill: currentColor;
         }
-        /* Botón central "+" destacado */
         .nav-center-btn {
             background: #ff3366;
             color: #fff;
-            width: 50px;
-            height: 50px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 26px;
+            font-size: 48px;
             font-weight: bold;
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 51, 102, 0.4);
-            margin-top: -10px;
+            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.5);
+            margin-top: -20px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Fijo -->
+    <!-- Header Fijo Limpio -->
     <header>
         <div class="logo">PHOTO<span>CLICK</span></div>
     </header>
 
-    <!-- Contenido Principal con Vistas Intercambiables -->
     <main>
-        
         <!-- VISTA 1: FEED (HOME) -->
         <section id="view-feed" class="view-section active">
             <!-- Banner Superior Adsterra (728x90) -->
-            <div class="top-ad-wrapper">
+            <div class="ad-wrapper" id="topAdSlot">
                 <div class="ad-label">Publicidad</div>
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : '94a60368d80726e04cbdceea35d7410e',
-                        'format' : 'iframe',
-                        'height' : 90,
-                        'width' : 728,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
             </div>
 
             <!-- Cuadrícula del Feed -->
@@ -275,50 +397,69 @@
 
         <!-- VISTA 2: PERFIL -->
         <section id="view-profile" class="view-section">
-            <div class="profile-container">
-                <div class="profile-title">Mi Perfil</div>
-                
-                <div class="profile-card">
-                    <h3>Normas y Monetización</h3>
-                    <p>• <strong>Regla de Publicación:</strong> 30 segundos de visualización de anuncios requeridos para subir contenido.</p>
-                    <p>• <strong>Límite Diario:</strong> Máximo 5 fotos permitidas por día.</p>
-                    <p>• <strong>Antispam:</strong> 30 minutos de retraso entre publicaciones.</p>
-                    <p>• <strong>Ventas y Ganancias:</strong> 50/50 de división de ingresos en ventas de $1 a $3.</p>
+            <div class="profile-title">Mi Perfil</div>
+            
+            <div class="profile-card">
+                <h3>Normas de Monetización</h3>
+                <p>• Visualización obligatoria de 30 segundos de anuncio antes de publicar.</p>
+                <p>• Límite máximo de 5 fotografías permitidas por día.</p>
+                <p>• Tiempo de espera de 30 minutos entre cada publicación.</p>
+                <p>• Ganancias divididas 50/50 en ventas de $1 a $5.</p>
+            </div>
+
+            <!-- Formulario para subir foto y elegir precio ($1 a $5) -->
+            <div class="upload-box">
+                <label>Título de la fotografía:</label>
+                <input type="text" id="photoTitleInput" class="upload-input" placeholder="Escribe un título corto...">
+
+                <label>Selecciona el archivo de imagen:</label>
+                <input type="file" id="photoFileInput" class="upload-input" accept="image/*">
+
+                <label>Elige el precio de venta (mínimo $1):</label>
+                <div class="price-options" id="priceSelector">
+                    <button type="button" class="price-opt-btn selected" onclick="selectPrice(1, this)">$1</button>
+                    <button type="button" class="price-opt-btn" onclick="selectPrice(2, this)">$2</button>
+                    <button type="button" class="price-opt-btn" onclick="selectPrice(3, this)">$3</button>
+                    <button type="button" class="price-opt-btn" onclick="selectPrice(4, this)">$4</button>
+                    <button type="button" class="price-opt-btn" onclick="selectPrice(5, this)">$5</button>
                 </div>
 
-                <button class="btn-action" onclick="alert('Módulo de subida de fotos conectado a Telegram')">Subir Nueva Foto</button>
+                <button class="btn-action" onclick="publishPhoto()">Publicar Fotografía</button>
+            </div>
 
-                <!-- Banner 320x50 para el Perfil -->
-                <div class="profile-ad-wrapper">
-                    <div class="ad-label">Publicidad</div>
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : '94a60368d80726e04cbdceea35d7410e',
-                            'format' : 'iframe',
-                            'height' : 50,
-                            'width' : 320,
-                            'params' : {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
-                </div>
+            <!-- Banner 320x50 en Perfil -->
+            <div class="ad-wrapper" id="profileAdSlot">
+                <div class="ad-label">Publicidad</div>
             </div>
         </section>
-
     </main>
+
+    <!-- Ventana Modal de Fotografía -->
+    <div class="modal-overlay" id="photoModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div class="modal-image-box" id="modalImageContainer">Vista previa</div>
+            <div class="modal-details">
+                <div class="modal-title" id="modalPhotoTitle">Título de Foto</div>
+                <div class="modal-actions">
+                    <button class="modal-btn" id="modalLikeBtn" onclick="toggleLike()">❤️ <span id="modalLikeCount">0</span></button>
+                    <button class="modal-btn" onclick="alert('Sección de comentarios')">💬 Comentar</button>
+                    <button class="modal-btn" onclick="alert('Enlace copiado para compartir')">🔗 Compartir</button>
+                    <button class="modal-btn buy-btn" id="modalBuyBtn" onclick="alert('Procesando compra...')">Comprar $1</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Barra de Navegación Inferior Fija -->
     <nav class="bottom-nav">
-        <!-- Esquina Izquierda: Home -->
         <button class="nav-item active" id="nav-home" onclick="switchView('feed')">
             <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             <span>Home</span>
         </button>
 
-        <!-- Centro: Cruz para Subir con Alerta de Monetización -->
         <button class="nav-center-btn" onclick="alert('Monetiza tus fotos, ve a tu perfil'); switchView('profile');">+</button>
 
-        <!-- Esquina Derecha: Perfil -->
         <button class="nav-item" id="nav-profile" onclick="switchView('profile')">
             <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
             <span>Perfil</span>
@@ -326,7 +467,150 @@
     </nav>
 
     <script>
-        // Cambiar entre pestañas de la aplicación
+        // Función real de inyección DOM para que los scripts de Adsterra sí se ejecuten
+        function injectAdsterraBanner(containerElement, width, height) {
+            const adBox = document.createElement('div');
+            adBox.style.width = width + 'px';
+            adBox.style.height = height + 'px';
+            adBox.style.overflow = 'hidden';
+
+            const iframe = document.createElement('iframe');
+            iframe.width = width;
+            iframe.height = height;
+            iframe.frameBorder = '0';
+            iframe.scrolling = 'no';
+            adBox.appendChild(iframe);
+            containerElement.appendChild(adBox);
+
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(`
+                <!DOCTYPE html>
+                <html>
+                <body style="margin:0;padding:0;background:transparent;">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '94a60368d80726e04cbdceea35d7410e',
+                            'format' : 'iframe',
+                            'height' : ${height},
+                            'width' : ${width},
+                            'params' : {}
+                        };
+                    <\/script>
+                    <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"><\/script>
+                </body>
+                </html>
+            `);
+            doc.close();
+        }
+
+        // Cargar banners fijos iniciales (Header 728x90 y Perfil 320x50)
+        injectAdsterraBanner(document.getElementById('topAdSlot'), 728, 90);
+        injectAdsterraBanner(document.getElementById('profileAdSlot'), 320, 50);
+
+        // Estado de fotografías (sin imágenes externas inventadas)
+        let photosData = [
+            { id: 1, title: "Espacio Foto 1", price: 1, likes: 0, imgSrc: null },
+            { id: 2, title: "Espacio Foto 2", price: 2, likes: 0, imgSrc: null },
+            { id: 3, title: "Espacio Foto 3", price: 1, likes: 0, imgSrc: null },
+            { id: 4, title: "Espacio Foto 4", price: 3, likes: 0, imgSrc: null },
+            { id: 5, title: "Espacio Foto 5", price: 5, likes: 0, imgSrc: null },
+            { id: 6, title: "Espacio Foto 6", price: 2, likes: 0, imgSrc: null }
+        ];
+
+        let selectedPrice = 1;
+        let currentModalIndex = null;
+
+        function selectPrice(price, btn) {
+            selectedPrice = price;
+            document.querySelectorAll('.price-opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function publishPhoto() {
+            const titleInput = document.getElementById('photoTitleInput');
+            const fileInput = document.getElementById('photoFileInput');
+            const title = titleInput.value.trim() || "Nueva Foto";
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photosData.unshift({
+                        id: Date.now(),
+                        title: title,
+                        price: selectedPrice,
+                        likes: 0,
+                        imgSrc: e.target.result
+                    });
+                    titleInput.value = '';
+                    fileInput.value = '';
+                    renderFeed();
+                    switchView('feed');
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                alert('Selecciona una imagen de tu galería primero.');
+            }
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('feedContainer');
+            container.innerHTML = '';
+
+            photosData.forEach((photo, index) => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.onclick = () => openModal(index);
+
+                const imgHtml = photo.imgSrc 
+                    ? `<img src="${photo.imgSrc}" alt="${photo.title}">` 
+                    : `<span>Sin imagen</span>`;
+
+                card.innerHTML = `
+                    <div class="photo-container">${imgHtml}</div>
+                    <div class="photo-info">
+                        <span class="photo-title">${photo.title}</span>
+                        <span class="photo-price-badge">$${photo.price}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                // Inyección real del banner de Adsterra cada 6 fotografías (cada 3 filas)
+                if ((index + 1) % 6 === 0) {
+                    const adDiv = document.createElement('div');
+                    adDiv.className = 'feed-ad-container';
+                    adDiv.innerHTML = `<div class="ad-label">Publicidad</div>`;
+                    container.appendChild(adDiv);
+                    injectAdsterraBanner(adDiv, 728, 90);
+                }
+            });
+        }
+
+        function openModal(index) {
+            currentModalIndex = index;
+            const photo = photosData[index];
+            const imgBox = document.getElementById('modalImageContainer');
+            imgBox.innerHTML = photo.imgSrc 
+                ? `<img src="${photo.imgSrc}" alt="${photo.title}">` 
+                : `<span>Sin imagen cargada</span>`;
+
+            document.getElementById('modalPhotoTitle').textContent = photo.title;
+            document.getElementById('modalLikeCount').textContent = photo.likes;
+            document.getElementById('modalBuyBtn').textContent = `Comprar $${photo.price}`;
+            document.getElementById('photoModal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('photoModal').classList.remove('open');
+        }
+
+        function toggleLike() {
+            if (currentModalIndex !== null) {
+                photosData[currentModalIndex].likes++;
+                document.getElementById('modalLikeCount').textContent = photosData[currentModalIndex].likes;
+            }
+        }
+
         function switchView(viewName) {
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -339,48 +623,6 @@
                 document.getElementById('nav-profile').classList.add('active');
             }
             window.scrollTo(0, 0);
-        }
-
-        // Renderizado del Feed con inyección de anuncios cada 6 fotos (3 filas)
-        const totalItems = 12;
-
-        function renderFeed() {
-            const container = document.getElementById('feedContainer');
-            let html = '';
-
-            for (let i = 1; i <= totalItems; i++) {
-                html += `
-                    <div class="photo-card">
-                        <div class="photo-container">
-                            <!-- Espacio reservado para contenido real -->
-                        </div>
-                        <div class="photo-info">
-                            <span class="photo-title">Foto #${i}</span>
-                            <span>❤️ 0</span>
-                        </div>
-                    </div>
-                `;
-
-                // Inyección del banner de Adsterra exactamente cada 6 fotografías (3 filas)
-                if (i % 6 === 0) {
-                    html += `
-                        <div class="feed-ad-container">
-                            <div class="ad-label">Publicidad</div>
-                            <script type="text/javascript">
-                                atOptions = {
-                                    'key' : '94a60368d80726e04cbdceea35d7410e',
-                                    'format' : 'iframe',
-                                    'height' : 90,
-                                    'width' : 728,
-                                    'params' : {}
-                                };
-                            </script><script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
-                        </div>
-                    `;
-                }
-            }
-
-            container.innerHTML = html;
         }
 
         renderFeed();
