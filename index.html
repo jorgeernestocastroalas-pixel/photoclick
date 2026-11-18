@@ -2,8 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photoclick - Feed</title>
+    <!-- Forzamos la escala y zoom para mantener proporción limpia tipo escritorio/móvil estable -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Photoclick</title>
     <style>
         * {
             box-sizing: border-box;
@@ -14,10 +15,10 @@
         body {
             background-color: #0b0b0b;
             color: #ffffff;
-            padding-bottom: 80px;
+            padding-bottom: 90px;
         }
 
-        /* Header Fijo con Respiro (Elegante y Flotante) */
+        /* Header Fijo Limpio */
         header {
             position: fixed;
             top: 0;
@@ -32,33 +33,34 @@
             z-index: 1000;
         }
         .logo {
-            font-size: 20px;
+            font-size: 40px; /* Título principal a 40px como se solicitó */
             font-weight: 800;
             letter-spacing: 1.5px;
             color: #ffffff;
+            line-height: 1;
         }
         .logo span {
             color: #ff3366;
         }
-        .user-stats {
-            font-size: 12px;
-            background: #1a1a1a;
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid #333;
-            color: #ddd;
-        }
 
-        /* Contenedor Principal con Margen Superior para el Header */
+        /* Contenedor Principal */
         main {
-            margin-top: 75px;
+            margin-top: 85px;
             padding: 12px;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
         }
 
-        /* Banner Superior Fijo (Adaptado para que no se desborde en móvil) */
+        /* Secciones de Vistas (Módulos) */
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+        }
+
+        /* Banner Superior Adsterra (728x90) */
         .top-ad-wrapper {
             background: #121212;
             border: 1px solid #222;
@@ -66,10 +68,10 @@
             padding: 10px;
             text-align: center;
             margin-bottom: 15px;
-            overflow-x: auto; /* Evita que rompa la pantalla si es muy ancho */
+            overflow-x: auto;
         }
         .ad-label {
-            font-size: 9px;
+            font-size: 10px;
             color: #555;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -83,7 +85,7 @@
             gap: 10px;
         }
 
-        /* Tarjeta de Foto (Estricta 1:1) */
+        /* Tarjeta de Foto (1:1 Proporcional) */
         .photo-card {
             background: #161616;
             border-radius: 8px;
@@ -95,7 +97,7 @@
         .photo-container {
             width: 100%;
             aspect-ratio: 1 / 1;
-            background: #222;
+            background: #1a1a1a;
             position: relative;
         }
         .photo-container img {
@@ -108,19 +110,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11px;
-            color: #aaa;
+            font-size: 13px;
+            color: #ccc;
         }
         .photo-title {
-            font-weight: 600;
+            font-weight: 500;
             color: #fff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 70%;
+            max-width: 75%;
         }
 
-        /* Contenedor de Banner Adsterra Intercalado en el Feed */
+        /* Banner Adsterra Intercalado (Cada 6 fotos / 3 filas) */
         .feed-ad-container {
             grid-column: span 2;
             background: #121212;
@@ -128,8 +130,115 @@
             border-radius: 8px;
             padding: 10px;
             text-align: center;
-            margin: 6px 0;
+            margin: 8px 0;
             overflow-x: auto;
+        }
+
+        /* Estilos del Perfil */
+        .profile-container {
+            padding: 20px 10px;
+            text-align: center;
+        }
+        .profile-title {
+            font-size: 40px; /* Título principal de sección a 40px */
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        .profile-card {
+            background: #161616;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .profile-card h3 {
+            font-size: 18px;
+            color: #ff3366;
+            margin-bottom: 10px;
+        }
+        .profile-card p {
+            font-size: 13px;
+            color: #bbb;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .btn-action {
+            display: block;
+            width: 100%;
+            background: #ff3366;
+            color: #white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        /* Banner 320x50 para Perfil */
+        .profile-ad-wrapper {
+            background: #121212;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        /* Barra de Navegación Inferior Fija */
+        nav.bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #121212;
+            border-top: 1px solid #1f1f1f;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        .nav-item {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            gap: 4px;
+        }
+        .nav-item.active {
+            color: #ff3366;
+        }
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+        /* Botón central "+" destacado */
+        .nav-center-btn {
+            background: #ff3366;
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 26px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 51, 102, 0.4);
+            margin-top: -10px;
         }
     </style>
 </head>
@@ -138,74 +247,138 @@
     <!-- Header Fijo -->
     <header>
         <div class="logo">PHOTO<span>CLICK</span></div>
-        <div class="user-stats">⭐ 0 Pts</div>
     </header>
 
-    <!-- Contenido Principal -->
+    <!-- Contenido Principal con Vistas Intercambiables -->
     <main>
         
-        <!-- Banner Superior Adsterra (728x90) -->
-        <div class="top-ad-wrapper">
-            <div class="ad-label">Publicidad</div>
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '94a60368d80726e04cbdceea35d7410e',
-                    'format' : 'iframe',
-                    'height' : 90,
-                    'width' : 728,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
-        </div>
+        <!-- VISTA 1: FEED (HOME) -->
+        <section id="view-feed" class="view-section active">
+            <!-- Banner Superior Adsterra (728x90) -->
+            <div class="top-ad-wrapper">
+                <div class="ad-label">Publicidad</div>
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '94a60368d80726e04cbdceea35d7410e',
+                        'format' : 'iframe',
+                        'height' : 90,
+                        'width' : 728,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
+            </div>
 
-        <!-- Cuadrícula del Feed -->
-        <div class="feed-grid" id="feedContainer"></div>
+            <!-- Cuadrícula del Feed -->
+            <div class="feed-grid" id="feedContainer"></div>
+        </section>
+
+        <!-- VISTA 2: PERFIL -->
+        <section id="view-profile" class="view-section">
+            <div class="profile-container">
+                <div class="profile-title">Mi Perfil</div>
+                
+                <div class="profile-card">
+                    <h3>Normas y Monetización</h3>
+                    <p>• <strong>Regla de Publicación:</strong> 30 segundos de visualización de anuncios requeridos para subir contenido.</p>
+                    <p>• <strong>Límite Diario:</strong> Máximo 5 fotos permitidas por día.</p>
+                    <p>• <strong>Antispam:</strong> 30 minutos de retraso entre publicaciones.</p>
+                    <p>• <strong>Ventas y Ganancias:</strong> 50/50 de división de ingresos en ventas de $1 a $3.</p>
+                </div>
+
+                <button class="btn-action" onclick="alert('Módulo de subida de fotos conectado a Telegram')">Subir Nueva Foto</button>
+
+                <!-- Banner 320x50 para el Perfil -->
+                <div class="profile-ad-wrapper">
+                    <div class="ad-label">Publicidad</div>
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '94a60368d80726e04cbdceea35d7410e',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
+                </div>
+            </div>
+        </section>
+
     </main>
 
+    <!-- Barra de Navegación Inferior Fija -->
+    <nav class="bottom-nav">
+        <!-- Esquina Izquierda: Home -->
+        <button class="nav-item active" id="nav-home" onclick="switchView('feed')">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span>Home</span>
+        </button>
+
+        <!-- Centro: Cruz para Subir con Alerta de Monetización -->
+        <button class="nav-center-btn" onclick="alert('Monetiza tus fotos, ve a tu perfil'); switchView('profile');">+</button>
+
+        <!-- Esquina Derecha: Perfil -->
+        <button class="nav-item" id="nav-profile" onclick="switchView('profile')">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <span>Perfil</span>
+        </button>
+    </nav>
+
     <script>
-        const samplePhotos = [
-            { title: "Atardecer urbano", url: "https://picsum.photos/seed/p1/500/500" },
-            { title: "Moda y estilo", url: "https://picsum.photos/seed/p2/500/500" },
-            { title: "Naturaleza viva", url: "https://picsum.photos/seed/p3/500/500" },
-            { title: "Café matutino", url: "https://picsum.photos/seed/p4/500/500" },
-            { title: "Arquitectura", url: "https://picsum.photos/seed/p5/500/500" },
-            { title: "Paisaje abierto", url: "https://picsum.photos/seed/p6/500/500" },
-            { title: "Vehículo en ruta", url: "https://picsum.photos/seed/p7/500/500" },
-            { title: "Tecnología", url: "https://picsum.photos/seed/p8/500/500" },
-            { title: "Luna llena", url: "https://picsum.photos/seed/p9/500/500" },
-            { title: "Estilo minimal", url: "https://picsum.photos/seed/p10/500/500" },
-            { title: "Calle principal", url: "https://picsum.photos/seed/p11/500/500" },
-            { title: "Arte visual", url: "https://picsum.photos/seed/p12/500/500" }
-        ];
+        // Cambiar entre pestañas de la aplicación
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+            if (viewName === 'feed') {
+                document.getElementById('view-feed').classList.add('active');
+                document.getElementById('nav-home').classList.add('active');
+            } else if (viewName === 'profile') {
+                document.getElementById('view-profile').classList.add('active');
+                document.getElementById('nav-profile').classList.add('active');
+            }
+            window.scrollTo(0, 0);
+        }
+
+        // Renderizado del Feed con inyección de anuncios cada 6 fotos (3 filas)
+        const totalItems = 12;
 
         function renderFeed() {
             const container = document.getElementById('feedContainer');
             let html = '';
 
-            samplePhotos.forEach((photo, index) => {
+            for (let i = 1; i <= totalItems; i++) {
                 html += `
                     <div class="photo-card">
                         <div class="photo-container">
-                            <img src="${photo.url}" alt="${photo.title}" loading="lazy">
+                            <!-- Espacio reservado para contenido real -->
                         </div>
                         <div class="photo-info">
-                            <span class="photo-title">${photo.title}</span>
+                            <span class="photo-title">Foto #${i}</span>
                             <span>❤️ 0</span>
                         </div>
                     </div>
                 `;
 
-                // Inserción limpia del banner cada 6 fotos usando bloques separados para evitar errores de sintaxis
-                if ((index + 1) % 6 === 0) {
+                // Inyección del banner de Adsterra exactamente cada 6 fotografías (3 filas)
+                if (i % 6 === 0) {
                     html += `
                         <div class="feed-ad-container">
                             <div class="ad-label">Publicidad</div>
-                            <iframe src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e" width="728" height="90" frameborder="0" scrolling="no"></iframe>
+                            <script type="text/javascript">
+                                atOptions = {
+                                    'key' : '94a60368d80726e04cbdceea35d7410e',
+                                    'format' : 'iframe',
+                                    'height' : 90,
+                                    'width' : 728,
+                                    'params' : {}
+                                };
+                            </script><script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
                         </div>
                     `;
                 }
-            });
+            }
 
             container.innerHTML = html;
         }
