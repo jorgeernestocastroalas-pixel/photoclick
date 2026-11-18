@@ -58,7 +58,7 @@
             margin-right: auto;
         }
 
-        /* Banner Superior Fijo (Debajo del Header con separación limpia) */
+        /* Banner Superior Fijo (Adaptado para que no se desborde en móvil) */
         .top-ad-wrapper {
             background: #121212;
             border: 1px solid #222;
@@ -66,6 +66,7 @@
             padding: 10px;
             text-align: center;
             margin-bottom: 15px;
+            overflow-x: auto; /* Evita que rompa la pantalla si es muy ancho */
         }
         .ad-label {
             font-size: 9px;
@@ -128,12 +129,7 @@
             padding: 10px;
             text-align: center;
             margin: 6px 0;
-        }
-
-        /* Adaptabilidad de los iframes de Adsterra para móviles */
-        iframe {
-            max-width: 100% !important;
-            height: auto !important;
+            overflow-x: auto;
         }
     </style>
 </head>
@@ -148,7 +144,7 @@
     <!-- Contenido Principal -->
     <main>
         
-        <!-- Banner Superior Adsterra (728x90 con su respectiva llave) -->
+        <!-- Banner Superior Adsterra (728x90) -->
         <div class="top-ad-wrapper">
             <div class="ad-label">Publicidad</div>
             <script type="text/javascript">
@@ -164,13 +160,10 @@
         </div>
 
         <!-- Cuadrícula del Feed -->
-        <div class="feed-grid" id="feedContainer">
-            <!-- Las fotos se inyectan dinámicamente aquí -->
-        </div>
+        <div class="feed-grid" id="feedContainer"></div>
     </main>
 
     <script>
-        // Mock de prueba para verificar filas y columnas
         const samplePhotos = [
             { title: "Atardecer urbano", url: "https://picsum.photos/seed/p1/500/500" },
             { title: "Moda y estilo", url: "https://picsum.photos/seed/p2/500/500" },
@@ -203,21 +196,12 @@
                     </div>
                 `;
 
-                // Inserción exacta del banner 728x90 cada 6 fotos (3 filas)
+                // Inserción limpia del banner cada 6 fotos usando bloques separados para evitar errores de sintaxis
                 if ((index + 1) % 6 === 0) {
                     html += `
                         <div class="feed-ad-container">
                             <div class="ad-label">Publicidad</div>
-                            <script type="text/javascript">
-                                atOptions = {
-                                    'key' : '94a60368d80726e04cbdceea35d7410e',
-                                    'format' : 'iframe',
-                                    'height' : 90,
-                                    'width' : 728,
-                                    'params' : {}
-                                };
-                            </script>
-                            <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"></script>
+                            <iframe src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e" width="728" height="90" frameborder="0" scrolling="no"></iframe>
                         </div>
                     `;
                 }
