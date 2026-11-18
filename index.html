@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=980">
     <title>Photoclick</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -41,13 +42,27 @@
         .logo span {
             color: #ff3366;
         }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .tg-status-pill {
+            font-size: 20px;
+            font-weight: 800;
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: #1b2631;
+            color: #7cc6fe;
+            border: 1px solid #2c3e50;
+        }
         .user-points-badge {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
             color: #ffd700;
             background: #1e1e1e;
-            padding: 6px 14px;
-            border-radius: 10px;
+            padding: 8px 16px;
+            border-radius: 12px;
             border: 1px solid #333;
         }
 
@@ -94,15 +109,15 @@
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            padding-bottom: 5px;
+            padding-bottom: 6px;
         }
         .filter-btn {
             background: #161616;
             color: #aaa;
             border: 1px solid #333;
-            padding: 12px 20px;
+            padding: 12px 22px;
             border-radius: 20px;
-            font-size: 22px;
+            font-size: 26px;
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
@@ -134,46 +149,54 @@
             aspect-ratio: 1 / 1;
             background: #1e1e1e;
             position: relative;
+            overflow: hidden;
         }
         .photo-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .watermark {
+        .watermark-overlay {
             position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            color: #ff3366;
-            padding: 4px 8px;
-            font-size: 18px;
-            font-weight: 800;
-            border-radius: 6px;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
             pointer-events: none;
+            opacity: 0.28;
+            transform: rotate(-22deg);
+        }
+        .watermark-text {
+            font-size: 28px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
         }
         .photo-info {
             padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
         .photo-title {
-            font-size: 36px;
+            font-size: 40px;
             font-weight: 700;
             color: #ffffff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 70%;
         }
-        .photo-price-badge {
+        .photo-likes-badge {
             font-size: 28px;
             font-weight: 800;
-            color: #00e676;
-            background: #102a1c;
-            padding: 4px 10px;
+            color: #ff6b8b;
+            background: #241218;
+            padding: 4px 12px;
             border-radius: 8px;
+            white-space: nowrap;
         }
 
         .feed-ad-container {
@@ -190,7 +213,7 @@
             justify-content: center;
         }
 
-        /* Ventana Modal de Foto (9x16) con Banner 320x50 */
+        /* Ventana Modal de Foto (9x16 con Banner 320x50) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -198,7 +221,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.94);
+            background: rgba(0, 0, 0, 0.95);
             z-index: 2000;
             justify-content: center;
             align-items: center;
@@ -209,10 +232,10 @@
         }
         .modal-content {
             background: #161616;
-            border: 2px solid #333;
-            border-radius: 16px;
+            border: 2px solid #444;
+            border-radius: 20px;
             width: 100%;
-            max-width: 520px;
+            max-width: 650px;
             overflow: hidden;
             position: relative;
         }
@@ -223,10 +246,10 @@
             background: #ff3366;
             color: #fff;
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            font-size: 30px;
+            font-size: 36px;
             font-weight: bold;
             cursor: pointer;
             z-index: 10;
@@ -234,62 +257,47 @@
         .modal-image-box {
             width: 100%;
             aspect-ratio: 9 / 16;
-            max-height: 420px;
+            max-height: 480px;
             background: #222;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
         .modal-image-box img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
-        .modal-watermark {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            color: #ff3366;
-            padding: 6px 12px;
-            font-size: 22px;
-            font-weight: 900;
-            border-radius: 8px;
-        }
         .modal-details {
-            padding: 20px;
+            padding: 25px;
         }
         .modal-title {
-            font-size: 36px;
+            font-size: 40px;
             font-weight: 800;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             color: #fff;
         }
         .modal-actions {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
         }
         .modal-btn {
-            padding: 12px 4px;
-            border-radius: 10px;
-            border: 1px solid #333;
+            padding: 18px 10px;
+            border-radius: 12px;
+            border: 1px solid #444;
             background: #222;
             color: #fff;
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 700;
             cursor: pointer;
             text-align: center;
         }
-        .modal-btn.buy-btn {
-            background: #00c853;
-            color: #000;
-            border: none;
-        }
 
-        /* Ventana Modal Obligatoria de Anuncio (30 Segundos) */
+        /* Ventana Modal Obligatoria de Anuncio (30s con Banner 300x250) */
         .ad-modal-overlay {
             display: none;
             position: fixed;
@@ -297,7 +305,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.96);
             z-index: 3000;
             justify-content: center;
             align-items: center;
@@ -309,33 +317,40 @@
         .ad-modal-content {
             background: #161616;
             border: 2px solid #ff3366;
-            border-radius: 16px;
-            padding: 25px;
+            border-radius: 20px;
+            padding: 30px;
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
             text-align: center;
         }
         .ad-modal-title {
-            font-size: 32px;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 8px;
-        }
-        .ad-modal-timer {
             font-size: 40px;
             font-weight: 900;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .ad-modal-subtitle {
+            font-size: 32px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .ad-modal-timer {
+            font-size: 48px;
+            font-weight: 900;
             color: #ff3366;
-            margin: 15px 0;
+            margin: 18px 0;
         }
         .ad-box-300x250 {
             width: 300px;
             height: 250px;
             background: #222;
-            margin: 0 auto 15px auto;
-            border: 1px solid #444;
+            margin: 0 auto 18px auto;
+            border: 1px solid #555;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         /* Textos a 40px en Perfil */
@@ -362,7 +377,7 @@
             font-size: 40px;
             color: #ddd;
             line-height: 1.4;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
         .upload-box {
             background: #161616;
@@ -375,38 +390,18 @@
             display: block;
             font-size: 40px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             color: #fff;
         }
         .upload-input {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             font-size: 36px;
             background: #0b0b0b;
             border: 1px solid #333;
             border-radius: 10px;
             color: #fff;
-            margin-bottom: 20px;
-        }
-        .price-options {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-        .price-opt-btn {
-            padding: 18px;
-            font-size: 36px;
-            font-weight: 800;
-            background: #222;
-            color: #fff;
-            border: 2px solid #333;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-        .price-opt-btn.selected {
-            background: #ff3366;
-            border-color: #ff3366;
+            margin-bottom: 22px;
         }
         .btn-action {
             display: block;
@@ -426,17 +421,10 @@
             color: #000;
             margin-top: 15px;
         }
-        .btn-withdraw {
-            background: #00c853;
-            color: #000;
-            border: none;
-            padding: 12px 20px;
-            font-size: 28px;
-            font-weight: 800;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-top: 15px;
-            width: 100%;
+        .btn-verify {
+            background: #0088cc;
+            color: #fff;
+            margin-top: 12px;
         }
 
         /* Barra de Navegación Inferior Fija */
@@ -493,10 +481,13 @@
 </head>
 <body>
 
-    <!-- Header Fijo con Puntos -->
+    <!-- Header Fijo con Estado Telegram y Contador de Puntos -->
     <header>
         <div class="logo">PHOTO<span>CLICK</span></div>
-        <div class="user-points-badge" id="userPointsDisplay">⭐ 0 Pts</div>
+        <div class="header-right">
+            <div class="tg-status-pill" id="tgStatusBadge">Web Preview</div>
+            <div class="user-points-badge" id="userPointsDisplay">⭐ 0 Pts</div>
+        </div>
     </header>
 
     <main>
@@ -517,7 +508,7 @@
                 <button class="filter-btn" onclick="filterCategory('Naturaleza', this)">Naturaleza</button>
             </div>
 
-            <!-- Grid de Feed (1x1) -->
+            <!-- Grid de Feed (1x1 Estricto) -->
             <div class="feed-grid" id="feedContainer"></div>
         </section>
 
@@ -529,15 +520,21 @@
             <div class="ad-wrapper" id="profileTopAdSlot">
                 <div class="ad-label">Publicidad</div>
             </div>
-            
-            <!-- Normas de Monetización -->
+
+            <!-- Normas de Monetización y Tráfico -->
             <div class="profile-card">
-                <h3>Normas de Monetización</h3>
-                <p>• Visualización obligatoria de 30 segundos de anuncio antes de publicar.</p>
-                <p>• Límite máximo de 5 fotografías permitidas por día.</p>
-                <p>• Cada 500 likes acumulados representan $0.05 para tu saldo.</p>
-                <p>• Ganancias divididas 50/50 en ventas directas de $1 a $5.</p>
-                <button class="btn-withdraw" onclick="openWithdrawModal()">Solicitar Retiro (Mínimo $10 - USDT Binance)</button>
+                <h3>Cómo funciona y monetiza</h3>
+                <p>• Sube fotos y genera tráfico para sumar impresiones y likes.</p>
+                <p>• Cada 500 likes acumulados en una foto representan $0.05 en tu meta de monetización.</p>
+                <p>• En plan gratis: 1 punto por like y anuncio obligatorio de 30s antes de publicar.</p>
+                <p>• Límite de 5 fotos al día en plan gratis (10 fotos al día con membresía).</p>
+            </div>
+
+            <!-- Estado de Telegram y Verificación Telefónica -->
+            <div class="profile-card" id="telegramAuthCard">
+                <h3>Verificación en Telegram</h3>
+                <p id="tgAccountInfo">• Estado: Pendiente de enlazar teléfono desde Telegram.</p>
+                <button class="btn-action btn-verify" onclick="requestTelegramPhoneVerification()">Verificar Teléfono en Telegram</button>
             </div>
 
             <!-- Formulario de Subida -->
@@ -557,71 +554,49 @@
                 <label>Selecciona el archivo de imagen:</label>
                 <input type="file" id="photoFileInput" class="upload-input" accept="image/*">
 
-                <label>Elige el precio de venta (mínimo $1):</label>
-                <div class="price-options" id="priceSelector">
-                    <button type="button" class="price-opt-btn selected" onclick="selectPrice(1, this)">$1</button>
-                    <button type="button" class="price-opt-btn" onclick="selectPrice(2, this)">$2</button>
-                    <button type="button" class="price-opt-btn" onclick="selectPrice(3, this)">$3</button>
-                    <button type="button" class="price-opt-btn" onclick="selectPrice(4, this)">$4</button>
-                    <button type="button" class="price-opt-btn" onclick="selectPrice(5, this)">$5</button>
-                </div>
-
                 <button class="btn-action" onclick="triggerAdBeforePublish()">Publicar Fotografía</button>
             </div>
 
-            <!-- Bloque de Membresía VIP hasta el final -->
-            <div class="profile-card" style="border: 2px solid #ffd700;">
-                <h3>Acelera tus ganancias ($5)</h3>
-                <p>• Beneficios: 10 fotos al día y 2 puntos por cada like sin ver anuncios (Plan VIP).</p>
-                <button class="btn-action btn-membership" onclick="buyMembership()">Adquirir Membresía VIP ($5)</button>
+            <!-- Bloque de Membresía al Final del Perfil -->
+            <div class="profile-card" style="border: 2px solid #ffd700;" id="membershipCard">
+                <h3>Acelera tus ganancias</h3>
+                <p>• Beneficios: 10 fotos al día y 2 puntos por cada like sin ver anuncios al publicar.</p>
+                <p id="membershipPointsStatus">• Meta de canje con puntos: 5,000 puntos.</p>
+                <button class="btn-action btn-membership" id="membershipActionBtn" onclick="handleMembershipAction()">
+                    Acumula 5,000 pts para activar membresía
+                </button>
             </div>
         </section>
     </main>
 
-    <!-- Ventana Modal Obligatoria de Anuncio con Banner 300x250 (30 Segundos) -->
+    <!-- Ventana Modal Obligatoria de Anuncio (30s con Banner 300x250) -->
     <div class="ad-modal-overlay" id="adModalOverlay">
         <div class="ad-modal-content">
-            <div class="ad-modal-title">Visualizando Anuncio Requerido</div>
-            <p style="font-size: 22px; color: #aaa; margin-bottom: 10px;">Espera los 30 segundos para publicar</p>
+            <div class="ad-modal-title">Anuncio antes de publicar</div>
+            <div class="ad-modal-subtitle">Espera los 30 segundos para habilitar la publicación</div>
             <div class="ad-box-300x250" id="ad300x250Container"></div>
             <div class="ad-modal-timer" id="adTimerDisplay">30</div>
-            <button class="btn-action" id="adFinishBtn" disabled style="background: #444; cursor: not-allowed; font-size: 30px; padding: 15px;" onclick="finishAdAndPublish()">Espera el contador...</button>
+            <button class="btn-action" id="adFinishBtn" disabled style="background: #444; cursor: not-allowed; font-size: 32px; padding: 18px;" onclick="finishAdAndPublish()">Espera el contador...</button>
         </div>
     </div>
 
-    <!-- Ventana Modal de Foto / Interacción (9x16 con Marca de Agua y Banner 320x50) -->
+    <!-- Ventana Modal de Foto (9x16 con Banner 320x50) -->
     <div class="modal-overlay" id="photoModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">×</button>
-            <div class="modal-image-box" id="modalImageContainer">
-                <div class="modal-watermark">PHOTOCLICK</div>
-            </div>
-            <div class="modal-details" style="padding: 15px 20px;">
-                <div class="modal-title" id="modalPhotoTitle" style="font-size: 30px; margin-bottom: 10px;">Título de Foto</div>
+            <div class="modal-image-box" id="modalImageContainer"></div>
+            <div class="modal-details">
+                <div class="modal-title" id="modalPhotoTitle">Título de Foto</div>
                 <div class="modal-actions">
                     <button class="modal-btn" id="modalLikeBtn" onclick="toggleLike()">❤️ <span id="modalLikeCount">0</span></button>
-                    <button class="modal-btn" onclick="alert('Sección de comentarios')">💬 Comentar</button>
-                    <button class="modal-btn" onclick="alert('Enlace copiado para compartir')">🔗 Compartir</button>
-                    <button class="modal-btn buy-btn" id="modalBuyBtn" onclick="buyPhotoModal()">Comprar $1</button>
+                    <button class="modal-btn" onclick="alert('Comentarios listos para activar')">💬 Comentar</button>
+                    <button class="modal-btn" onclick="copyShareLink()">🔗 Compartir</button>
                 </div>
-                <!-- Banner 320x50 Integrado en la Modal -->
-                <div class="ad-wrapper" id="modalAdSlot" style="margin-bottom: 0; padding: 8px;">
-                    <div class="ad-label" style="font-size: 10px; margin-bottom: 4px;">Publicidad</div>
+                <!-- Banner 320x50 Integrado en la Modal del Feed -->
+                <div class="ad-wrapper" id="modalAdSlot" style="margin-bottom: 0; padding: 10px;">
+                    <div class="ad-label" style="font-size: 12px; margin-bottom: 6px;">Publicidad</div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Ventana Modal de Cobro (Retiro Mínimo $10, Net 30, USDT Binance) -->
-    <div class="modal-overlay" id="withdrawModal">
-        <div class="modal-content" style="padding: 25px;">
-            <button class="modal-close" onclick="closeWithdrawModal()">×</button>
-            <div class="profile-title" style="font-size: 36px; margin-bottom: 15px;">Solicitar Retiro</div>
-            <p style="font-size: 24px; color: #ddd; margin-bottom: 15px;">• Retiro mínimo: <strong>$10.00</strong></p>
-            <p style="font-size: 24px; color: #ddd; margin-bottom: 15px;">• Sistema de pago: <strong>Net 30 (USDT / Binance)</strong></p>
-            <label style="display:block; font-size: 24px; color:#fff; margin-bottom: 8px;">Dirección de tu billetera USDT (Binance BEP20):</label>
-            <input type="text" id="binanceWalletInput" class="upload-input" placeholder="Ingresa tu wallet o ID de Binance..." style="font-size: 24px; margin-bottom: 15px;">
-            <button class="btn-action" style="font-size: 28px; padding: 16px;" onclick="submitWithdrawal()">Enviar Solicitud de Retiro</button>
         </div>
     </div>
 
@@ -641,26 +616,100 @@
     </nav>
 
     <script>
-        let userPoints = 0;
-        // Automatización de Membresía: Se guarda fecha de expiración en localStorage
-        let vipExpiration = localStorage.getItem('photoclick_vip_exp') ? parseInt(localStorage.getItem('photoclick_vip_exp')) : 0;
-        
+        const MEMBERSHIP_COST_POINTS = 5000;
+        let userPoints = parseInt(localStorage.getItem('photoclick_points') || '0', 10);
+        let vipExpiration = parseInt(localStorage.getItem('photoclick_vip_exp') || '0', 10);
+        let phoneVerified = localStorage.getItem('photoclick_phone_verified') === 'true';
+
+        let photosData = [];
+        let currentFilter = 'Todas';
+        let currentModalIndex = null;
+        let adInterval = null;
+
+        // Detección de Telegram WebApp
+        const tgApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+        if (tgApp && tgApp.initDataUnsafe && tgApp.initDataUnsafe.user) {
+            tgApp.ready();
+            const tgUser = tgApp.initDataUnsafe.user;
+            document.getElementById('tgStatusBadge').textContent = 'Telegram ID: ' + tgUser.id;
+            document.getElementById('tgAccountInfo').textContent =
+                `• Usuario Telegram: @${tgUser.username || tgUser.first_name} (ID ${tgUser.id}) — Teléfono: ${phoneVerified ? 'Verificado' : 'Pendiente'}`;
+        }
+
         function checkIsVIP() {
             return Date.now() < vipExpiration;
         }
 
-        let photosData = [];
-        let currentFilter = 'Todas';
-        let selectedPrice = 1;
-        let currentModalIndex = null;
-        let adInterval = null;
+        function saveUserState() {
+            localStorage.setItem('photoclick_points', String(userPoints));
+            localStorage.setItem('photoclick_vip_exp', String(vipExpiration));
+            localStorage.setItem('photoclick_phone_verified', String(phoneVerified));
+        }
 
-        function updatePointsDisplay() {
+        function updateUIState() {
             document.getElementById('userPointsDisplay').textContent = `⭐ ${userPoints} Pts`;
+
+            const statusEl = document.getElementById('membershipPointsStatus');
+            const btnEl = document.getElementById('membershipActionBtn');
+
+            if (checkIsVIP()) {
+                const daysLeft = Math.max(1, Math.ceil((vipExpiration - Date.now()) / (24 * 60 * 60 * 1000)));
+                statusEl.textContent = `• Membresía activa (${daysLeft} días restantes). Fotos nuevas ganan 2 pts/like.`;
+                btnEl.textContent = 'Membresía Activa';
+            } else if (userPoints >= MEMBERSHIP_COST_POINTS) {
+                statusEl.textContent = `• ¡Tienes suficientes puntos (${userPoints} / ${MEMBERSHIP_COST_POINTS}) para canjear tu membresía!`;
+                btnEl.textContent = 'Canjear Membresía con 5,000 Puntos';
+            } else {
+                const missing = MEMBERSHIP_COST_POINTS - userPoints;
+                statusEl.textContent = `• Te faltan ${missing} puntos para desbloquear el canje de membresía (5,000 pts).`;
+                btnEl.textContent = `Acumula 5,000 pts (${userPoints}/${MEMBERSHIP_COST_POINTS})`;
+            }
+        }
+
+        function requestTelegramPhoneVerification() {
+            if (tgApp && typeof tgApp.requestContact === 'function') {
+                tgApp.requestContact((shared) => {
+                    if (shared) {
+                        phoneVerified = true;
+                        saveUserState();
+                        document.getElementById('tgAccountInfo').textContent = '• Teléfono verificado desde Telegram.';
+                        alert('Teléfono compartido y verificado en Telegram.');
+                    } else {
+                        alert('Debes compartir tu contacto en Telegram para verificar tu cuenta.');
+                    }
+                });
+            } else {
+                // Modo prueba en navegador normal antes de enlazar el bot
+                phoneVerified = true;
+                saveUserState();
+                document.getElementById('tgAccountInfo').textContent = '• Verificación de prueba activada (conecta tu bot de Telegram para validación real).';
+                alert('Estado de verificación actualizado para pruebas. En producción el bot validará el contacto de Telegram.');
+            }
+        }
+
+        function handleMembershipAction() {
+            if (checkIsVIP()) {
+                alert('Tu membresía ya está activa.');
+                return;
+            }
+            if (userPoints < MEMBERSHIP_COST_POINTS) {
+                alert(`Aún no alcanzas los ${MEMBERSHIP_COST_POINTS} puntos. Sigue acumulando likes y tráfico.`);
+                return;
+            }
+            if (!phoneVerified) {
+                alert('Primero verifica tu teléfono en Telegram para evitar cuentas granja al canjear puntos.');
+                return;
+            }
+
+            userPoints -= MEMBERSHIP_COST_POINTS;
+            vipExpiration = Date.now() + (30 * 24 * 60 * 60 * 1000);
+            saveUserState();
+            updateUIState();
+            alert('¡Membresía activada por 30 días! Tus próximas fotos ganarán 2 puntos por like sin anuncio previo.');
         }
 
         function injectAdsterraBanner(containerElement, width, height) {
-            containerElement.innerHTML = '<div class="ad-label">Publicidad</div>';
+            containerElement.innerHTML = '<div class="ad-label" style="font-size:12px; margin-bottom:6px;">Publicidad</div>';
             const adBox = document.createElement('div');
             adBox.style.width = width + 'px';
             adBox.style.height = height + 'px';
@@ -696,42 +745,8 @@
             doc.close();
         }
 
-        // Cargar banners iniciales
         injectAdsterraBanner(document.getElementById('topAdSlot'), 728, 90);
         injectAdsterraBanner(document.getElementById('profileTopAdSlot'), 728, 90);
-
-        function selectPrice(price, btn) {
-            selectedPrice = price;
-            document.querySelectorAll('.price-opt-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-        }
-
-        function buyMembership() {
-            // Automatización: Suma 30 días exactos al momento de compra
-            vipExpiration = Date.now() + (30 * 24 * 60 * 60 * 1000);
-            localStorage.setItem('photoclick_vip_exp', vipExpiration);
-            alert('¡Membresía VIP activada por 30 días! Las fotos activas y nuevas ganan 2 puntos por like y se acelera tu monetización.');
-        }
-
-        function openWithdrawModal() {
-            document.getElementById('withdrawModal').classList.add('open');
-        }
-        function closeWithdrawModal() {
-            document.getElementById('withdrawModal').classList.remove('open');
-        }
-        function submitWithdrawal() {
-            const wallet = document.getElementById('binanceWalletInput').value.trim();
-            if (!wallet) {
-                alert('Ingresa tu billetera o ID de Binance.');
-                return;
-            }
-            if (userPoints < 1000) { // Ejemplo operativo de retiro mínimo $10
-                alert('El retiro mínimo es de $10.00 (sistema Net 30). Acumula más puntos o ventas.');
-                return;
-            }
-            alert('¡Solicitud de retiro enviada con éxito bajo sistema Net 30 a tu billetera USDT!');
-            closeWithdrawModal();
-        }
 
         function filterCategory(category, btn) {
             currentFilter = category;
@@ -753,7 +768,6 @@
                 return;
             }
 
-            // Si es VIP vigente, se salta el anuncio publicitario obligatorio de subida
             if (checkIsVIP()) {
                 executePublish();
             } else {
@@ -787,7 +801,7 @@
                     finishBtn.disabled = false;
                     finishBtn.style.background = '#ff3366';
                     finishBtn.style.cursor = 'pointer';
-                    finishBtn.textContent = 'Continuar Publicación';
+                    finishBtn.textContent = 'Publicar Ahora';
                 }
             }, 1000);
         }
@@ -804,34 +818,40 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Automatización del ID y Plan de la foto según membresía vigente al momento exacto de subir
-                const isVipPhoto = checkIsVIP();
-                const photoPlanType = isVipPhoto ? 'membresia' : 'gratis';
+                const photoPlanType = checkIsVIP() ? 'membresia' : 'gratis';
                 const photoId = 'PHOTO_' + Date.now() + '_' + photoPlanType;
 
                 photosData.unshift({
                     id: photoId,
                     title: titleInput.value.trim(),
                     category: catInput.value,
-                    price: selectedPrice,
                     likes: 0,
                     plan: photoPlanType,
                     imgSrc: e.target.result
                 });
+
                 titleInput.value = '';
                 fileInput.value = '';
                 renderFeed();
                 switchView('feed');
-                alert(`¡Fotografía publicada con éxito! (${photoPlanType.toUpperCase()})`);
+                alert('¡Fotografía publicada en el feed!');
             };
             reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function createWatermarkHTML() {
+            return `
+                <div class="watermark-overlay">
+                    <div class="watermark-text">PHOTOCLICK</div>
+                    <div class="watermark-text">PHOTOCLICK</div>
+                </div>
+            `;
         }
 
         function renderFeed() {
             const container = document.getElementById('feedContainer');
             container.innerHTML = '';
 
-            // Filtrar por categoría seleccionada
             const filteredPhotos = photosData.filter(photo => {
                 if (currentFilter === 'Todas') return true;
                 return photo.category === currentFilter;
@@ -845,11 +865,11 @@
                 card.innerHTML = `
                     <div class="photo-container">
                         <img src="${photo.imgSrc}" alt="${photo.title}">
-                        <div class="watermark">PHOTOCLICK</div>
+                        ${createWatermarkHTML()}
                     </div>
                     <div class="photo-info">
                         <span class="photo-title">${photo.title}</span>
-                        <span class="photo-price-badge">$${photo.price}</span>
+                        <span class="photo-likes-badge">❤️ ${photo.likes}</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -869,16 +889,12 @@
             const imgBox = document.getElementById('modalImageContainer');
             imgBox.innerHTML = `
                 <img src="${photo.imgSrc}" alt="${photo.title}">
-                <div class="modal-watermark">PHOTOCLICK</div>
+                ${createWatermarkHTML()}
             `;
 
             document.getElementById('modalPhotoTitle').textContent = photo.title;
             document.getElementById('modalLikeCount').textContent = photo.likes;
-            document.getElementById('modalBuyBtn').textContent = `Comprar $${photo.price}`;
-            
-            // Cargar banner 320x50 dentro de la modal
             injectAdsterraBanner(document.getElementById('modalAdSlot'), 320, 50);
-
             document.getElementById('photoModal').classList.add('open');
         }
 
@@ -886,27 +902,30 @@
             document.getElementById('photoModal').classList.remove('open');
         }
 
-        function buyPhotoModal() {
-            const photo = photosData[currentModalIndex];
-            alert(`Para comprar "${photo.title}" por $${photo.price}, realiza tu pago USDT (BEP20) a tu Binance Pay / Wallet asignada y recibe la foto original limpia.`);
-        }
-
         function toggleLike() {
             if (currentModalIndex !== null) {
                 const photo = photosData[currentModalIndex];
                 photo.likes++;
                 document.getElementById('modalLikeCount').textContent = photo.likes;
-                
-                // Automatización de puntos según el plan con el que fue publicada la foto
-                // Si la foto es membresía, da 2 puntos; si es gratis, da 1 punto.
+
                 const pointsEarned = (photo.plan === 'membresia') ? 2 : 1;
                 userPoints += pointsEarned;
-                updatePointsDisplay();
+                saveUserState();
+                updateUIState();
+                renderFeed();
 
-                // Notificación automática si alcanza la meta de monetización (500 likes = $0.05)
-                if (photo.likes === 500) {
-                    alert(`¡Felicidades! La foto "${photo.title}" alcanzó los 500 likes y ha sumado $0.05 a tu saldo de cobro.`);
+                if (photo.likes % 500 === 0) {
+                    alert(`¡La foto "${photo.title}" completó ${photo.likes} likes ($0.05 acumulados en su ciclo)!`);
                 }
+            }
+        }
+
+        function copyShareLink() {
+            const url = window.location.href;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => alert('Enlace copiado.'));
+            } else {
+                alert('Enlace listo para compartir: ' + url);
             }
         }
 
@@ -924,6 +943,7 @@
             window.scrollTo(0, 0);
         }
 
+        updateUIState();
         renderFeed();
     </script>
 </body>
