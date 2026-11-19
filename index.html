@@ -81,13 +81,6 @@
             align-items: center;
             justify-content: center;
         }
-        .ad-label {
-            font-size: 16px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 8px;
-        }
 
         /* Buscador de Categorías en el Feed */
         .search-bar-container {
@@ -299,21 +292,6 @@
             position: relative;
             margin: auto;
         }
-        .ad-modal-close {
-            position: absolute;
-            top: 20px;
-            right: 22px;
-            background: #2a2a2a;
-            color: #fff;
-            border: 1px solid #555;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-        }
         .ad-modal-title {
             font-size: 46px;
             font-weight: 900;
@@ -497,9 +475,7 @@
         <!-- VISTA 1: FEED (HOME) -->
         <section id="view-feed" class="view-section active">
             <!-- Banner Superior 728x90 -->
-            <div class="ad-wrapper" id="topAdSlot">
-                <div class="ad-label">Publicidad</div>
-            </div>
+            <div class="ad-wrapper" id="topAdSlot"></div>
 
             <!-- Buscador / Filtro de Categorías -->
             <div class="search-bar-container" id="categoryFilterBar">
@@ -520,9 +496,7 @@
             <div class="profile-title">Mi Perfil</div>
 
             <!-- Banner 728x90 Inmediatamente Debajo del Header en Perfil -->
-            <div class="ad-wrapper" id="profileTopAdSlot">
-                <div class="ad-label">Publicidad</div>
-            </div>
+            <div class="ad-wrapper" id="profileTopAdSlot"></div>
 
             <!-- Reglas del Plan Gratis -->
             <div class="profile-card">
@@ -584,14 +558,12 @@
     <!-- Ventana Modal Ampliada y Centrada para Verificación de Anuncio (30s con Banner 300x250) -->
     <div class="ad-modal-overlay" id="adModalOverlay">
         <div class="ad-modal-content">
-            <button class="ad-modal-close" onclick="closeAdModal()">×</button>
             <div style="width: 100%;">
                 <div class="ad-modal-title">Verificación antes de publicar</div>
                 <div class="ad-modal-subtitle">Espera los 30 segundos para publicar tu foto</div>
             </div>
 
             <div class="ad-stage-300x250">
-                <div class="ad-label" style="font-size: 18px; margin-bottom: 10px;">Publicidad (300 x 250)</div>
                 <div class="ad-box-300x250" id="ad300x250Container"></div>
             </div>
 
@@ -615,9 +587,7 @@
                     <button class="modal-btn" onclick="copyShareLink()">🔗 Compartir</button>
                 </div>
                 <!-- Banner 320x50 Integrado en la Modal del Feed -->
-                <div class="ad-wrapper" id="modalAdSlot" style="margin-bottom: 0; padding: 12px;">
-                    <div class="ad-label" style="font-size: 14px; margin-bottom: 6px;">Publicidad</div>
-                </div>
+                <div class="ad-wrapper" id="modalAdSlot" style="margin-bottom: 0; padding: 12px;"></div>
             </div>
         </div>
     </div>
@@ -961,15 +931,11 @@
             }, 1000);
         }
 
-        function closeAdModal() {
-            if (adInterval) clearInterval(adInterval);
-            document.getElementById('adModalOverlay').classList.remove('open');
-        }
-
         function finishAdAndPublish() {
             const finishBtn = document.getElementById('adFinishBtn');
             if (finishBtn.disabled) return;
-            closeAdModal();
+            if (adInterval) clearInterval(adInterval);
+            document.getElementById('adModalOverlay').classList.remove('open');
             executePublish();
         }
 
@@ -1037,7 +1003,6 @@
                 if ((index + 1) % 6 === 0) {
                     const adDiv = document.createElement('div');
                     adDiv.className = 'feed-ad-container';
-                    adDiv.innerHTML = '<div class="ad-label">Publicidad</div>';
                     const adInner = document.createElement('div');
                     adDiv.appendChild(adInner);
                     injectAdsterraBanner(adInner, 728, 90, BANNER_728_KEY, BANNER_728_SRC);
@@ -1056,7 +1021,7 @@
             document.getElementById('modalLikeCount').textContent = photo.likes;
 
             const modalAdSlot = document.getElementById('modalAdSlot');
-            modalAdSlot.innerHTML = '<div class="ad-label" style="font-size: 14px; margin-bottom: 6px;">Publicidad</div>';
+            modalAdSlot.innerHTML = '';
             const modalAdBox = document.createElement('div');
             modalAdSlot.appendChild(modalAdBox);
             injectAdsterraBanner(modalAdBox, 320, 50, BANNER_320_KEY, BANNER_320_SRC);
