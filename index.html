@@ -82,8 +82,8 @@
             justify-content: center;
         }
         .ad-label {
-            font-size: 14px;
-            color: #666;
+            font-size: 16px;
+            color: #888;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             margin-bottom: 8px;
@@ -203,7 +203,7 @@
             border: 2px solid #444;
             border-radius: 20px;
             width: 100%;
-            max-width: 650px;
+            max-width: 760px;
             overflow: hidden;
             position: relative;
         }
@@ -214,10 +214,10 @@
             background: #ff3366;
             color: #fff;
             border: none;
-            width: 60px;
-            height: 60px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
-            font-size: 36px;
+            font-size: 40px;
             font-weight: bold;
             cursor: pointer;
             z-index: 10;
@@ -225,7 +225,7 @@
         .modal-image-box {
             width: 100%;
             aspect-ratio: 9 / 16;
-            max-height: 480px;
+            max-height: 540px;
             background: #222;
             position: relative;
             display: flex;
@@ -259,13 +259,13 @@
             border: 1px solid #444;
             background: #222;
             color: #fff;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             cursor: pointer;
             text-align: center;
         }
 
-        /* Ventana Modal Obligatoria de Anuncio (30s con Banner 300x250) */
+        /* Ventana Modal Grande de Anuncio Antes de Publicar (30s con Banner 300x250) */
         .ad-modal-overlay {
             display: none;
             position: fixed;
@@ -278,47 +278,84 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            overflow-y: auto;
         }
         .ad-modal-overlay.open {
             display: flex;
         }
         .ad-modal-content {
             background: #161616;
-            border: 2px solid #ff3366;
-            border-radius: 20px;
-            padding: 30px;
-            width: 100%;
-            max-width: 600px;
+            border: 3px solid #ff3366;
+            border-radius: 24px;
+            padding: 36px 28px;
+            width: 94%;
+            max-width: 900px;
+            min-height: 760px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
             text-align: center;
+            position: relative;
+        }
+        .ad-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 22px;
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #555;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
         }
         .ad-modal-title {
-            font-size: 40px;
+            font-size: 44px;
             font-weight: 900;
             color: #fff;
+            margin-top: 10px;
             margin-bottom: 12px;
         }
         .ad-modal-subtitle {
-            font-size: 32px;
-            color: #ccc;
-            margin-bottom: 20px;
+            font-size: 40px;
+            line-height: 1.3;
+            color: #ddd;
+            margin-bottom: 24px;
         }
-        .ad-modal-timer {
-            font-size: 48px;
-            font-weight: 900;
-            color: #ff3366;
-            margin: 18px 0;
+        .ad-stage-300x250 {
+            width: 100%;
+            max-width: 520px;
+            min-height: 310px;
+            background: #101010;
+            margin: 10px auto 24px auto;
+            border: 2px solid #383838;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            padding: 18px;
         }
         .ad-box-300x250 {
             width: 300px;
             height: 250px;
-            background: #222;
-            margin: 0 auto 18px auto;
-            border: 1px solid #555;
+            background: #1b1b1b;
+            border: 1px solid #444;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 10px;
             overflow: hidden;
+        }
+        .ad-modal-timer {
+            font-size: 56px;
+            font-weight: 900;
+            color: #ff3366;
+            margin: 12px 0 22px 0;
         }
 
         /* Textos a 40px en Perfil */
@@ -506,7 +543,7 @@
                 </select>
 
                 <label>Selecciona el archivo de imagen:</label>
-                <input type="file" id="photoFileInput" class="upload-input" accept="image/*">
+                <input type="file" id="photoFileInput" class="upload-input" accept="image/*" onchange="handleFileSelection(this)">
 
                 <button class="btn-action" id="publishBtn" onclick="triggerAdBeforePublish()">Publicar Fotografía</button>
             </div>
@@ -525,14 +562,24 @@
         </section>
     </main>
 
-    <!-- Ventana Modal Obligatoria de Anuncio (30s con Banner 300x250) -->
+    <!-- Ventana Modal Grande de Anuncio (30s con Banner 300x250) -->
     <div class="ad-modal-overlay" id="adModalOverlay">
         <div class="ad-modal-content">
-            <div class="ad-modal-title">Anuncio antes de publicar</div>
-            <div class="ad-modal-subtitle">Espera los 30 segundos para publicar</div>
-            <div class="ad-box-300x250" id="ad300x250Container"></div>
-            <div class="ad-modal-timer" id="adTimerDisplay">30</div>
-            <button class="btn-action" id="adFinishBtn" disabled style="background: #444; cursor: not-allowed; font-size: 32px; padding: 18px;" onclick="finishAdAndPublish()">Espera el contador...</button>
+            <button class="ad-modal-close" onclick="closeAdModal()">×</button>
+            <div>
+                <div class="ad-modal-title">Verificación antes de publicar</div>
+                <div class="ad-modal-subtitle">Espera los 30 segundos para publicar tu foto</div>
+            </div>
+
+            <div class="ad-stage-300x250">
+                <div class="ad-label" style="font-size: 20px; margin-bottom: 12px;">Publicidad (300 x 250)</div>
+                <div class="ad-box-300x250" id="ad300x250Container"></div>
+            </div>
+
+            <div style="width: 100%;">
+                <div class="ad-modal-timer" id="adTimerDisplay">30</div>
+                <button class="btn-action" id="adFinishBtn" disabled style="background: #3a3a3a; color: #aaa; cursor: not-allowed; padding: 24px;" onclick="finishAdAndPublish()">Espera el contador...</button>
+            </div>
         </div>
     </div>
 
@@ -549,8 +596,8 @@
                     <button class="modal-btn" onclick="copyShareLink()">🔗 Compartir</button>
                 </div>
                 <!-- Banner 320x50 Integrado en la Modal del Feed -->
-                <div class="ad-wrapper" id="modalAdSlot" style="margin-bottom: 0; padding: 10px;">
-                    <div class="ad-label" style="font-size: 12px; margin-bottom: 6px;">Publicidad</div>
+                <div class="ad-wrapper" id="modalAdSlot" style="margin-bottom: 0; padding: 12px;">
+                    <div class="ad-label" style="font-size: 14px; margin-bottom: 6px;">Publicidad</div>
                 </div>
             </div>
         </div>
@@ -580,8 +627,9 @@
         let vipExpiration = parseInt(localStorage.getItem('photoclick_vip_exp') || '0', 10);
         let lastPublishTime = parseInt(localStorage.getItem('photoclick_last_publish') || '0', 10);
         let publishTimestamps = JSON.parse(localStorage.getItem('photoclick_publish_times') || '[]');
+        let photosData = JSON.parse(localStorage.getItem('photoclick_photos_data') || '[]');
 
-        let photosData = [];
+        let pendingPhotoDataUrl = '';
         let currentFilter = 'Todas';
         let currentModalIndex = null;
         let adInterval = null;
@@ -622,6 +670,23 @@
             localStorage.setItem('photoclick_vip_exp', String(vipExpiration));
             localStorage.setItem('photoclick_last_publish', String(lastPublishTime));
             localStorage.setItem('photoclick_publish_times', JSON.stringify(publishTimestamps));
+            try {
+                localStorage.setItem('photoclick_photos_data', JSON.stringify(photosData));
+            } catch (err) {
+                // Si la imagen es muy pesada para localStorage, se mantiene en memoria durante la sesión
+            }
+        }
+
+        function handleFileSelection(input) {
+            pendingPhotoDataUrl = '';
+            const file = input.files && input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                pendingPhotoDataUrl = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         function updateUIState() {
@@ -678,26 +743,29 @@
         }
 
         function injectAdsterraBanner(containerElement, width, height, key, scriptSrc) {
-            containerElement.innerHTML = '<div class="ad-label" style="font-size:12px; margin-bottom:6px;">Publicidad</div>';
-            const adBox = document.createElement('div');
-            adBox.style.width = width + 'px';
-            adBox.style.height = height + 'px';
-            adBox.style.overflow = 'hidden';
-
+            containerElement.innerHTML = '';
             const iframe = document.createElement('iframe');
-            iframe.width = width;
-            iframe.height = height;
+            iframe.width = String(width);
+            iframe.height = String(height);
+            iframe.style.width = width + 'px';
+            iframe.style.height = height + 'px';
+            iframe.style.border = 'none';
+            iframe.style.display = 'block';
             iframe.frameBorder = '0';
             iframe.scrolling = 'no';
-            adBox.appendChild(iframe);
-            containerElement.appendChild(adBox);
+            containerElement.appendChild(iframe);
 
             const doc = iframe.contentWindow.document;
             doc.open();
             doc.write(`
                 <!DOCTYPE html>
                 <html>
-                <body style="margin:0;padding:0;background:transparent;">
+                <head>
+                    <style>
+                        html, body { margin: 0; padding: 0; width: ${width}px; height: ${height}px; overflow: hidden; background: transparent; display: flex; align-items: center; justify-content: center; }
+                    </style>
+                </head>
+                <body>
                     <script type="text/javascript">
                         atOptions = {
                             'key' : '${key}',
@@ -723,8 +791,15 @@
         const BANNER_300_KEY = '4dfb9a5937a21eac92dacd7d5199d46c';
         const BANNER_300_SRC = 'https://bicea.org/22/4dfb9a5937a21eac92dacd7d5199d46c';
 
-        injectAdsterraBanner(document.getElementById('topAdSlot'), 728, 90, BANNER_728_KEY, BANNER_728_SRC);
-        injectAdsterraBanner(document.getElementById('profileTopAdSlot'), 728, 90, BANNER_728_KEY, BANNER_728_SRC);
+        const topAdSlot = document.getElementById('topAdSlot');
+        const topAdBox = document.createElement('div');
+        topAdSlot.appendChild(topAdBox);
+        injectAdsterraBanner(topAdBox, 728, 90, BANNER_728_KEY, BANNER_728_SRC);
+
+        const profileTopAdSlot = document.getElementById('profileTopAdSlot');
+        const profileTopAdBox = document.createElement('div');
+        profileTopAdSlot.appendChild(profileTopAdBox);
+        injectAdsterraBanner(profileTopAdBox, 728, 90, BANNER_728_KEY, BANNER_728_SRC);
 
         function filterCategory(category, btn) {
             currentFilter = category;
@@ -752,8 +827,22 @@
                 alert('Escribe un título para la fotografía.');
                 return;
             }
-            if (!fileInput.files || !fileInput.files[0]) {
+            if ((!fileInput.files || !fileInput.files[0]) && !pendingPhotoDataUrl) {
                 alert('Selecciona una imagen de tu galería.');
+                return;
+            }
+
+            if (fileInput.files && fileInput.files[0] && !pendingPhotoDataUrl) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    pendingPhotoDataUrl = e.target.result;
+                    if (checkIsVIP()) {
+                        executePublish();
+                    } else {
+                        openAdModal();
+                    }
+                };
+                reader.readAsDataURL(fileInput.files[0]);
                 return;
             }
 
@@ -776,7 +865,8 @@
             const finishBtn = document.getElementById('adFinishBtn');
             timerDisplay.textContent = timeLeft;
             finishBtn.disabled = true;
-            finishBtn.style.background = '#444';
+            finishBtn.style.background = '#3a3a3a';
+            finishBtn.style.color = '#aaa';
             finishBtn.style.cursor = 'not-allowed';
             finishBtn.textContent = 'Espera el contador...';
 
@@ -789,14 +879,22 @@
                     clearInterval(adInterval);
                     finishBtn.disabled = false;
                     finishBtn.style.background = '#ff3366';
+                    finishBtn.style.color = '#ffffff';
                     finishBtn.style.cursor = 'pointer';
                     finishBtn.textContent = 'Publicar Ahora';
                 }
             }, 1000);
         }
 
-        function finishAdAndPublish() {
+        function closeAdModal() {
+            if (adInterval) clearInterval(adInterval);
             document.getElementById('adModalOverlay').classList.remove('open');
+        }
+
+        function finishAdAndPublish() {
+            const finishBtn = document.getElementById('adFinishBtn');
+            if (finishBtn.disabled) return;
+            closeAdModal();
             executePublish();
         }
 
@@ -805,32 +903,35 @@
             const catInput = document.getElementById('photoCategoryInput');
             const fileInput = document.getElementById('photoFileInput');
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const photoPlanType = checkIsVIP() ? 'membresia' : 'gratis';
-                const now = Date.now();
+            const finalImgSrc = pendingPhotoDataUrl || (fileInput.files && fileInput.files[0] ? URL.createObjectURL(fileInput.files[0]) : '');
+            if (!finalImgSrc) {
+                alert('No se pudo cargar la imagen. Intenta seleccionarla de nuevo.');
+                return;
+            }
 
-                photosData.unshift({
-                    id: 'PHOTO_' + now + '_' + photoPlanType,
-                    title: titleInput.value.trim(),
-                    category: catInput.value,
-                    likes: 0,
-                    plan: photoPlanType,
-                    imgSrc: e.target.result
-                });
+            const photoPlanType = checkIsVIP() ? 'membresia' : 'gratis';
+            const now = Date.now();
 
-                lastPublishTime = now;
-                publishTimestamps.push(now);
-                saveUserState();
+            photosData.unshift({
+                id: 'PHOTO_' + now + '_' + photoPlanType,
+                title: titleInput.value.trim(),
+                category: catInput.value,
+                likes: 0,
+                plan: photoPlanType,
+                imgSrc: finalImgSrc
+            });
 
-                titleInput.value = '';
-                fileInput.value = '';
-                updateUIState();
-                renderFeed();
-                switchView('feed');
-                alert('¡Fotografía publicada!');
-            };
-            reader.readAsDataURL(fileInput.files[0]);
+            lastPublishTime = now;
+            publishTimestamps.push(now);
+            saveUserState();
+
+            titleInput.value = '';
+            fileInput.value = '';
+            pendingPhotoDataUrl = '';
+            updateUIState();
+            renderFeed();
+            switchView('feed');
+            alert('¡Fotografía publicada con éxito!');
         }
 
         function renderFeed() {
@@ -862,7 +963,10 @@
                 if ((index + 1) % 6 === 0) {
                     const adDiv = document.createElement('div');
                     adDiv.className = 'feed-ad-container';
-                    injectAdsterraBanner(adDiv, 728, 90, BANNER_728_KEY, BANNER_728_SRC);
+                    adDiv.innerHTML = '<div class="ad-label">Publicidad</div>';
+                    const adInner = document.createElement('div');
+                    adDiv.appendChild(adInner);
+                    injectAdsterraBanner(adInner, 728, 90, BANNER_728_KEY, BANNER_728_SRC);
                     container.appendChild(adDiv);
                 }
             });
@@ -876,7 +980,13 @@
 
             document.getElementById('modalPhotoTitle').textContent = photo.title;
             document.getElementById('modalLikeCount').textContent = photo.likes;
-            injectAdsterraBanner(document.getElementById('modalAdSlot'), 320, 50, BANNER_320_KEY, BANNER_320_SRC);
+
+            const modalAdSlot = document.getElementById('modalAdSlot');
+            modalAdSlot.innerHTML = '<div class="ad-label" style="font-size: 14px; margin-bottom: 6px;">Publicidad</div>';
+            const modalAdBox = document.createElement('div');
+            modalAdSlot.appendChild(modalAdBox);
+            injectAdsterraBanner(modalAdBox, 320, 50, BANNER_320_KEY, BANNER_320_SRC);
+
             document.getElementById('photoModal').classList.add('open');
         }
 
