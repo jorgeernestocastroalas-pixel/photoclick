@@ -327,7 +327,6 @@
             color: #ddd;
             margin-bottom: 20px;
         }
-        /* Contenedor estricto y perfectamente centrado para el banner 300x250 */
         .ad-stage-300x250 {
             width: 100%;
             max-width: 420px;
@@ -428,6 +427,11 @@
             color: #000;
             margin-top: 15px;
         }
+        .btn-withdraw {
+            background: #198754;
+            color: #ffffff;
+            margin-top: 15px;
+        }
 
         /* Barra de Navegación Inferior Fija */
         nav.bottom-nav {
@@ -525,8 +529,8 @@
                 <h3>Plan Gratis</h3>
                 <p>• 5 fotos al día.</p>
                 <p>• Ver anuncio antes de publicar.</p>
-                <p>• Esperar 1 hora para la próxima publicación.</p>
-                <p>• 1 like = 1 punto.</p>
+                <p>• Esperar 30 minutos para la próxima publicación.</p>
+                <p>• 1 like = 1 punto (10,000 pts = $1.00).</p>
                 <p id="cooldownStatusText">• Próxima publicación disponible: Ahora.</p>
             </div>
 
@@ -550,15 +554,28 @@
                 <button class="btn-action" id="publishBtn" onclick="triggerAdBeforePublish()">Publicar Fotografía</button>
             </div>
 
-            <!-- Bloque de Membresía al Final del Perfil -->
+            <!-- Bloque de Membresía (50,000 Puntos = $5.00) -->
             <div class="profile-card" style="border: 2px solid #ffd700;" id="membershipCard">
                 <h3>Acelera tu saldo</h3>
-                <p>• 10 fotos gratis separadas por 1 hora.</p>
+                <p>• 10 fotos gratis separadas por 30 minutos.</p>
                 <p>• 1 like = 2 puntos.</p>
                 <p>• Sin ver anuncios para publicar.</p>
-                <p id="membershipPointsStatus">• Canje disponible al llegar a 5,000 puntos.</p>
+                <p id="membershipPointsStatus">• Canje disponible al llegar a 50,000 puntos ($5.00).</p>
                 <button class="btn-action btn-membership" id="membershipActionBtn" onclick="handleMembershipAction()">
-                    Acumula 5,000 pts para activar membresía
+                    Acumula 50,000 pts para activar membresía
+                </button>
+            </div>
+
+            <!-- Bloque de Retiro (Mínimo $5.00 = 50,000 Puntos) -->
+            <div class="profile-card" style="border: 2px solid #198754;" id="withdrawCard">
+                <h3>Retirar Saldo ($5.00 Mínimo)</h3>
+                <p>• Retiro mínimo: 50,000 puntos ($5.00).</p>
+                <p>• Ciclo Net 30 (en práctica ~Net 60) sujeto a revisión.</p>
+                <p id="withdrawPointsStatus">• Saldo estimado actual: $0.00 (0 / 50,000 pts).</p>
+                <p id="withdrawSavedAddressStatus" style="display: none;"></p>
+                <input type="text" id="withdrawAddressInput" class="upload-input" placeholder="Dirección para enviar el dinero...">
+                <button class="btn-action btn-withdraw" id="withdrawActionBtn" onclick="handleWithdrawAction()">
+                    Retirar $5.00 (50,000 pts)
                 </button>
             </div>
         </section>
@@ -621,8 +638,10 @@
     </nav>
 
     <script>
-        const MEMBERSHIP_COST_POINTS = 5000;
-        const ONE_HOUR_MS = 60 * 60 * 1000;
+        const POINTS_PER_DOLLAR = 10000;
+        const MEMBERSHIP_COST_POINTS = 50000;
+        const WITHDRAW_MIN_POINTS = 50000;
+        const COOLDOWN_MS = 30 * 60 * 1000;
         const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
         let userPoints = parseInt(localStorage.getItem('photoclick_points') || '0', 10);
@@ -630,6 +649,7 @@
         let lastPublishTime = parseInt(localStorage.getItem('photoclick_last_publish') || '0', 10);
         let publishTimestamps = JSON.parse(localStorage.getItem('photoclick_publish_times') || '[]');
         let photosData = JSON.parse(localStorage.getItem('photoclick_photos_data') || '[]');
+        let withdrawRequests = JSON.parse(localStorage.getItem('photoclick_withdraw_requests') || '[]');
 
         let pendingPhotoDataUrl = '';
         let currentFilter = 'Todas';
@@ -657,7 +677,7 @@
         function getRemainingCooldownMs() {
             if (!lastPublishTime) return 0;
             const elapsed = Date.now() - lastPublishTime;
-            return Math.max(0, ONE_HOUR_MS - elapsed);
+            return Math.max(0, COOLDOWN_MS - elapsed);
         }
 
         function formatRemainingTime(ms) {
@@ -672,6 +692,7 @@
             localStorage.setItem('photoclick_vip_exp', String(vipExpiration));
             localStorage.setItem('photoclick_last_publish', String(lastPublishTime));
             localStorage.setItem('photoclick_publish_times', JSON.stringify(publishTimestamps));
+            localStorage.setItem('photoclick_withdraw_requests', JSON.stringify(withdrawRequests));
             try {
                 localStorage.setItem('photoclick_photos_data', JSON.stringify(photosData));
             } catch (err) {}
@@ -699,7 +720,7 @@
             const publishBtn = document.getElementById('publishBtn');
 
             if (remainingMs > 0) {
-                cooldownEl.textContent = `• Espera de 1 hora: faltan ${formatRemainingTime(remainingMs)}. (${recentCount}/${dailyLimit} hoy)`;
+                cooldownEl.textContent = `• Espera de 30 min: faltan ${formatRemainingTime(remainingMs)}. (${recentCount}/${dailyLimit} hoy)`;
                 publishBtn.textContent = `Espera ${formatRemainingTime(remainingMs)}`;
             } else if (recentCount >= dailyLimit) {
                 cooldownEl.textContent = `• Límite diario alcanzado (${recentCount}/${dailyLimit} fotos hoy).`;
@@ -718,11 +739,33 @@
                 btnEl.textContent = 'Saldo Acelerado Activo';
             } else if (userPoints >= MEMBERSHIP_COST_POINTS) {
                 statusEl.textContent = `• ¡Tienes suficientes puntos (${userPoints} / ${MEMBERSHIP_COST_POINTS}) para activar!`;
-                btnEl.textContent = 'Activar con 5,000 Puntos';
+                btnEl.textContent = 'Activar con 50,000 Puntos ($5.00)';
             } else {
                 const missing = MEMBERSHIP_COST_POINTS - userPoints;
-                statusEl.textContent = `• Te faltan ${missing} puntos para los 5,000 pts.`;
-                btnEl.textContent = `Acumula 5,000 pts (${userPoints}/${MEMBERSHIP_COST_POINTS})`;
+                statusEl.textContent = `• Te faltan ${missing} puntos para los 50,000 pts ($5.00).`;
+                btnEl.textContent = `Acumula 50,000 pts (${userPoints}/${MEMBERSHIP_COST_POINTS})`;
+            }
+
+            const usdValue = (userPoints / POINTS_PER_DOLLAR).toFixed(2);
+            const withdrawStatusEl = document.getElementById('withdrawPointsStatus');
+            const withdrawBtnEl = document.getElementById('withdrawActionBtn');
+            const savedAddrEl = document.getElementById('withdrawSavedAddressStatus');
+
+            withdrawStatusEl.textContent = `• Saldo estimado actual: $${usdValue} (${userPoints} / ${WITHDRAW_MIN_POINTS} pts).`;
+
+            if (userPoints >= WITHDRAW_MIN_POINTS) {
+                withdrawBtnEl.textContent = `Retirar $${usdValue} (${userPoints} pts)`;
+            } else {
+                const missingWithdraw = WITHDRAW_MIN_POINTS - userPoints;
+                withdrawBtnEl.textContent = `Faltan ${missingWithdraw} pts para retirar $5.00`;
+            }
+
+            if (withdrawRequests.length > 0) {
+                const lastReq = withdrawRequests[withdrawRequests.length - 1];
+                savedAddrEl.style.display = 'block';
+                savedAddrEl.textContent = `• Última solicitud en dispositivo: $${lastReq.amountUsd} a "${lastReq.address}" (Net 30 / ~Net 60).`;
+            } else {
+                savedAddrEl.style.display = 'none';
             }
         }
 
@@ -732,14 +775,45 @@
                 return;
             }
             if (userPoints < MEMBERSHIP_COST_POINTS) {
-                alert(`Aún no llegas a los ${MEMBERSHIP_COST_POINTS} puntos.`);
+                alert(`Necesitas ${MEMBERSHIP_COST_POINTS} puntos ($5.00) para activar la membresía.`);
                 return;
             }
             userPoints -= MEMBERSHIP_COST_POINTS;
             vipExpiration = Date.now() + (30 * ONE_DAY_MS);
             saveUserState();
             updateUIState();
-            alert('¡Acelera tu saldo activado por 30 días! 10 fotos/día (1 por hora) y 2 puntos por like sin anuncios.');
+            alert('¡Acelera tu saldo activado por 30 días! 10 fotos/día (cada 30 min) y 2 puntos por like sin anuncios.');
+        }
+
+        function handleWithdrawAction() {
+            const addrInput = document.getElementById('withdrawAddressInput');
+            const address = addrInput.value.trim();
+
+            if (userPoints < WITHDRAW_MIN_POINTS) {
+                alert(`El retiro mínimo es de $5.00 (${WITHDRAW_MIN_POINTS} puntos).`);
+                return;
+            }
+            if (!address) {
+                alert('Escribe la dirección para enviar el dinero.');
+                return;
+            }
+
+            const amountUsd = (userPoints / POINTS_PER_DOLLAR).toFixed(2);
+            const spentPoints = userPoints;
+
+            withdrawRequests.push({
+                address: address,
+                points: spentPoints,
+                amountUsd: amountUsd,
+                date: new Date().toISOString(),
+                cycle: 'Net 30 (~Net 60)'
+            });
+
+            userPoints = 0;
+            addrInput.value = '';
+            saveUserState();
+            updateUIState();
+            alert(`Solicitud registrada por $${amountUsd} (${spentPoints} pts) a "${address}". Queda guardada localmente en este dispositivo bajo ciclo Net 30 (~Net 60) hasta conectar el backend.`);
         }
 
         function injectAdsterraBanner(containerElement, width, height, key, scriptSrc) {
@@ -817,7 +891,7 @@
             const dailyLimit = getDailyLimit();
 
             if (remainingMs > 0) {
-                alert(`Debes esperar 1 hora entre publicaciones. Tiempo restante: ${formatRemainingTime(remainingMs)}.`);
+                alert(`Debes esperar 30 minutos entre publicaciones. Tiempo restante: ${formatRemainingTime(remainingMs)}.`);
                 return;
             }
             if (recentCount >= dailyLimit) {
