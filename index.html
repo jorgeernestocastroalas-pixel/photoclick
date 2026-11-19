@@ -18,7 +18,7 @@
             padding-bottom: 140px;
         }
 
-        /* Header Fijo Limpio */
+        /* Header Fijo */
         header {
             position: fixed;
             top: 0;
@@ -41,20 +41,6 @@
         }
         .logo span {
             color: #ff3366;
-        }
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .tg-status-pill {
-            font-size: 20px;
-            font-weight: 800;
-            padding: 8px 14px;
-            border-radius: 10px;
-            background: #1b2631;
-            color: #7cc6fe;
-            border: 1px solid #2c3e50;
         }
         .user-points-badge {
             font-size: 32px;
@@ -155,24 +141,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-        .watermark-overlay {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            align-items: center;
-            pointer-events: none;
-            opacity: 0.28;
-            transform: rotate(-22deg);
-        }
-        .watermark-text {
-            font-size: 28px;
-            font-weight: 900;
-            color: #ffffff;
-            letter-spacing: 3px;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
         }
         .photo-info {
             padding: 16px;
@@ -421,11 +389,6 @@
             color: #000;
             margin-top: 15px;
         }
-        .btn-verify {
-            background: #0088cc;
-            color: #fff;
-            margin-top: 12px;
-        }
 
         /* Barra de Navegación Inferior Fija */
         nav.bottom-nav {
@@ -481,13 +444,10 @@
 </head>
 <body>
 
-    <!-- Header Fijo con Estado Telegram y Contador de Puntos -->
+    <!-- Header Fijo con Contador de Puntos -->
     <header>
         <div class="logo">PHOTO<span>CLICK</span></div>
-        <div class="header-right">
-            <div class="tg-status-pill" id="tgStatusBadge">Web Preview</div>
-            <div class="user-points-badge" id="userPointsDisplay">⭐ 0 Pts</div>
-        </div>
+        <div class="user-points-badge" id="userPointsDisplay">⭐ 0 Pts</div>
     </header>
 
     <main>
@@ -521,20 +481,14 @@
                 <div class="ad-label">Publicidad</div>
             </div>
 
-            <!-- Normas de Monetización y Tráfico -->
+            <!-- Reglas del Plan Gratis -->
             <div class="profile-card">
-                <h3>Cómo funciona y monetiza</h3>
-                <p>• Sube fotos y genera tráfico para sumar impresiones y likes.</p>
-                <p>• Cada 500 likes acumulados en una foto representan $0.05 en tu meta de monetización.</p>
-                <p>• En plan gratis: 1 punto por like y anuncio obligatorio de 30s antes de publicar.</p>
-                <p>• Límite de 5 fotos al día en plan gratis (10 fotos al día con membresía).</p>
-            </div>
-
-            <!-- Estado de Telegram y Verificación Telefónica -->
-            <div class="profile-card" id="telegramAuthCard">
-                <h3>Verificación en Telegram</h3>
-                <p id="tgAccountInfo">• Estado: Pendiente de enlazar teléfono desde Telegram.</p>
-                <button class="btn-action btn-verify" onclick="requestTelegramPhoneVerification()">Verificar Teléfono en Telegram</button>
+                <h3>Plan Gratis</h3>
+                <p>• 5 fotos al día.</p>
+                <p>• Ver anuncio antes de publicar.</p>
+                <p>• Esperar 1 hora para la próxima publicación.</p>
+                <p>• 1 like = 1 punto.</p>
+                <p id="cooldownStatusText">• Próxima publicación disponible: Ahora.</p>
             </div>
 
             <!-- Formulario de Subida -->
@@ -554,14 +508,16 @@
                 <label>Selecciona el archivo de imagen:</label>
                 <input type="file" id="photoFileInput" class="upload-input" accept="image/*">
 
-                <button class="btn-action" onclick="triggerAdBeforePublish()">Publicar Fotografía</button>
+                <button class="btn-action" id="publishBtn" onclick="triggerAdBeforePublish()">Publicar Fotografía</button>
             </div>
 
             <!-- Bloque de Membresía al Final del Perfil -->
             <div class="profile-card" style="border: 2px solid #ffd700;" id="membershipCard">
-                <h3>Acelera tus ganancias</h3>
-                <p>• Beneficios: 10 fotos al día y 2 puntos por cada like sin ver anuncios al publicar.</p>
-                <p id="membershipPointsStatus">• Meta de canje con puntos: 5,000 puntos.</p>
+                <h3>Acelera tu saldo</h3>
+                <p>• 10 fotos gratis separadas por 1 hora.</p>
+                <p>• 1 like = 2 puntos.</p>
+                <p>• Sin ver anuncios para publicar.</p>
+                <p id="membershipPointsStatus">• Canje disponible al llegar a 5,000 puntos.</p>
                 <button class="btn-action btn-membership" id="membershipActionBtn" onclick="handleMembershipAction()">
                     Acumula 5,000 pts para activar membresía
                 </button>
@@ -573,7 +529,7 @@
     <div class="ad-modal-overlay" id="adModalOverlay">
         <div class="ad-modal-content">
             <div class="ad-modal-title">Anuncio antes de publicar</div>
-            <div class="ad-modal-subtitle">Espera los 30 segundos para habilitar la publicación</div>
+            <div class="ad-modal-subtitle">Espera los 30 segundos para publicar</div>
             <div class="ad-box-300x250" id="ad300x250Container"></div>
             <div class="ad-modal-timer" id="adTimerDisplay">30</div>
             <button class="btn-action" id="adFinishBtn" disabled style="background: #444; cursor: not-allowed; font-size: 32px; padding: 18px;" onclick="finishAdAndPublish()">Espera el contador...</button>
@@ -589,7 +545,7 @@
                 <div class="modal-title" id="modalPhotoTitle">Título de Foto</div>
                 <div class="modal-actions">
                     <button class="modal-btn" id="modalLikeBtn" onclick="toggleLike()">❤️ <span id="modalLikeCount">0</span></button>
-                    <button class="modal-btn" onclick="alert('Comentarios listos para activar')">💬 Comentar</button>
+                    <button class="modal-btn" onclick="alert('Comentarios listos')">💬 Comentar</button>
                     <button class="modal-btn" onclick="copyShareLink()">🔗 Compartir</button>
                 </div>
                 <!-- Banner 320x50 Integrado en la Modal del Feed -->
@@ -607,7 +563,7 @@
             <span>Home</span>
         </button>
 
-        <button class="nav-center-btn" onclick="alert('Monetiza tus fotos, ve a tu perfil'); switchView('profile');">+</button>
+        <button class="nav-center-btn" onclick="switchView('profile')">+</button>
 
         <button class="nav-item" id="nav-profile" onclick="switchView('profile')">
             <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
@@ -617,98 +573,111 @@
 
     <script>
         const MEMBERSHIP_COST_POINTS = 5000;
+        const ONE_HOUR_MS = 60 * 60 * 1000;
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
         let userPoints = parseInt(localStorage.getItem('photoclick_points') || '0', 10);
         let vipExpiration = parseInt(localStorage.getItem('photoclick_vip_exp') || '0', 10);
-        let phoneVerified = localStorage.getItem('photoclick_phone_verified') === 'true';
+        let lastPublishTime = parseInt(localStorage.getItem('photoclick_last_publish') || '0', 10);
+        let publishTimestamps = JSON.parse(localStorage.getItem('photoclick_publish_times') || '[]');
 
         let photosData = [];
         let currentFilter = 'Todas';
         let currentModalIndex = null;
         let adInterval = null;
 
-        // Detección de Telegram WebApp
-        const tgApp = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-        if (tgApp && tgApp.initDataUnsafe && tgApp.initDataUnsafe.user) {
-            tgApp.ready();
-            const tgUser = tgApp.initDataUnsafe.user;
-            document.getElementById('tgStatusBadge').textContent = 'Telegram ID: ' + tgUser.id;
-            document.getElementById('tgAccountInfo').textContent =
-                `• Usuario Telegram: @${tgUser.username || tgUser.first_name} (ID ${tgUser.id}) — Teléfono: ${phoneVerified ? 'Verificado' : 'Pendiente'}`;
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
         }
 
         function checkIsVIP() {
             return Date.now() < vipExpiration;
         }
 
+        function getDailyLimit() {
+            return checkIsVIP() ? 10 : 5;
+        }
+
+        function getRecentPublishCount() {
+            const cutoff = Date.now() - ONE_DAY_MS;
+            publishTimestamps = publishTimestamps.filter(ts => ts > cutoff);
+            return publishTimestamps.length;
+        }
+
+        function getRemainingCooldownMs() {
+            if (!lastPublishTime) return 0;
+            const elapsed = Date.now() - lastPublishTime;
+            return Math.max(0, ONE_HOUR_MS - elapsed);
+        }
+
+        function formatRemainingTime(ms) {
+            const totalSeconds = Math.ceil(ms / 1000);
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            return `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+        }
+
         function saveUserState() {
             localStorage.setItem('photoclick_points', String(userPoints));
             localStorage.setItem('photoclick_vip_exp', String(vipExpiration));
-            localStorage.setItem('photoclick_phone_verified', String(phoneVerified));
+            localStorage.setItem('photoclick_last_publish', String(lastPublishTime));
+            localStorage.setItem('photoclick_publish_times', JSON.stringify(publishTimestamps));
         }
 
         function updateUIState() {
             document.getElementById('userPointsDisplay').textContent = `⭐ ${userPoints} Pts`;
 
+            const remainingMs = getRemainingCooldownMs();
+            const recentCount = getRecentPublishCount();
+            const dailyLimit = getDailyLimit();
+            const cooldownEl = document.getElementById('cooldownStatusText');
+            const publishBtn = document.getElementById('publishBtn');
+
+            if (remainingMs > 0) {
+                cooldownEl.textContent = `• Espera de 1 hora: faltan ${formatRemainingTime(remainingMs)}. (${recentCount}/${dailyLimit} hoy)`;
+                publishBtn.textContent = `Espera ${formatRemainingTime(remainingMs)}`;
+            } else if (recentCount >= dailyLimit) {
+                cooldownEl.textContent = `• Límite diario alcanzado (${recentCount}/${dailyLimit} fotos hoy).`;
+                publishBtn.textContent = 'Límite Diario Alcanzado';
+            } else {
+                cooldownEl.textContent = `• Próxima publicación disponible: Ahora (${recentCount}/${dailyLimit} hoy).`;
+                publishBtn.textContent = 'Publicar Fotografía';
+            }
+
             const statusEl = document.getElementById('membershipPointsStatus');
             const btnEl = document.getElementById('membershipActionBtn');
 
             if (checkIsVIP()) {
-                const daysLeft = Math.max(1, Math.ceil((vipExpiration - Date.now()) / (24 * 60 * 60 * 1000)));
-                statusEl.textContent = `• Membresía activa (${daysLeft} días restantes). Fotos nuevas ganan 2 pts/like.`;
-                btnEl.textContent = 'Membresía Activa';
+                const daysLeft = Math.max(1, Math.ceil((vipExpiration - Date.now()) / ONE_DAY_MS));
+                statusEl.textContent = `• Saldo acelerado activo (${daysLeft} días restantes). 1 like = 2 pts.`;
+                btnEl.textContent = 'Saldo Acelerado Activo';
             } else if (userPoints >= MEMBERSHIP_COST_POINTS) {
-                statusEl.textContent = `• ¡Tienes suficientes puntos (${userPoints} / ${MEMBERSHIP_COST_POINTS}) para canjear tu membresía!`;
-                btnEl.textContent = 'Canjear Membresía con 5,000 Puntos';
+                statusEl.textContent = `• ¡Tienes suficientes puntos (${userPoints} / ${MEMBERSHIP_COST_POINTS}) para activar!`;
+                btnEl.textContent = 'Activar con 5,000 Puntos';
             } else {
                 const missing = MEMBERSHIP_COST_POINTS - userPoints;
-                statusEl.textContent = `• Te faltan ${missing} puntos para desbloquear el canje de membresía (5,000 pts).`;
+                statusEl.textContent = `• Te faltan ${missing} puntos para los 5,000 pts.`;
                 btnEl.textContent = `Acumula 5,000 pts (${userPoints}/${MEMBERSHIP_COST_POINTS})`;
-            }
-        }
-
-        function requestTelegramPhoneVerification() {
-            if (tgApp && typeof tgApp.requestContact === 'function') {
-                tgApp.requestContact((shared) => {
-                    if (shared) {
-                        phoneVerified = true;
-                        saveUserState();
-                        document.getElementById('tgAccountInfo').textContent = '• Teléfono verificado desde Telegram.';
-                        alert('Teléfono compartido y verificado en Telegram.');
-                    } else {
-                        alert('Debes compartir tu contacto en Telegram para verificar tu cuenta.');
-                    }
-                });
-            } else {
-                // Modo prueba en navegador normal antes de enlazar el bot
-                phoneVerified = true;
-                saveUserState();
-                document.getElementById('tgAccountInfo').textContent = '• Verificación de prueba activada (conecta tu bot de Telegram para validación real).';
-                alert('Estado de verificación actualizado para pruebas. En producción el bot validará el contacto de Telegram.');
             }
         }
 
         function handleMembershipAction() {
             if (checkIsVIP()) {
-                alert('Tu membresía ya está activa.');
+                alert('Tu saldo acelerado ya está activo.');
                 return;
             }
             if (userPoints < MEMBERSHIP_COST_POINTS) {
-                alert(`Aún no alcanzas los ${MEMBERSHIP_COST_POINTS} puntos. Sigue acumulando likes y tráfico.`);
+                alert(`Aún no llegas a los ${MEMBERSHIP_COST_POINTS} puntos.`);
                 return;
             }
-            if (!phoneVerified) {
-                alert('Primero verifica tu teléfono en Telegram para evitar cuentas granja al canjear puntos.');
-                return;
-            }
-
             userPoints -= MEMBERSHIP_COST_POINTS;
-            vipExpiration = Date.now() + (30 * 24 * 60 * 60 * 1000);
+            vipExpiration = Date.now() + (30 * ONE_DAY_MS);
             saveUserState();
             updateUIState();
-            alert('¡Membresía activada por 30 días! Tus próximas fotos ganarán 2 puntos por like sin anuncio previo.');
+            alert('¡Acelera tu saldo activado por 30 días! 10 fotos/día (1 por hora) y 2 puntos por like sin anuncios.');
         }
 
-        function injectAdsterraBanner(containerElement, width, height) {
+        function injectAdsterraBanner(containerElement, width, height, key, scriptSrc) {
             containerElement.innerHTML = '<div class="ad-label" style="font-size:12px; margin-bottom:6px;">Publicidad</div>';
             const adBox = document.createElement('div');
             adBox.style.width = width + 'px';
@@ -731,22 +700,31 @@
                 <body style="margin:0;padding:0;background:transparent;">
                     <script type="text/javascript">
                         atOptions = {
-                            'key' : '94a60368d80726e04cbdceea35d7410e',
+                            'key' : '${key}',
                             'format' : 'iframe',
                             'height' : ${height},
                             'width' : ${width},
                             'params' : {}
                         };
                     <\/script>
-                    <script type="text/javascript" src="https://bicea.org/22/94a60368d80726e04cbdceea35d7410e"><\/script>
+                    <script type="text/javascript" src="${scriptSrc}"><\/script>
                 </body>
                 </html>
             `);
             doc.close();
         }
 
-        injectAdsterraBanner(document.getElementById('topAdSlot'), 728, 90);
-        injectAdsterraBanner(document.getElementById('profileTopAdSlot'), 728, 90);
+        const BANNER_728_KEY = '94a60368d80726e04cbdceea35d7410e';
+        const BANNER_728_SRC = 'https://bicea.org/22/94a60368d80726e04cbdceea35d7410e';
+
+        const BANNER_320_KEY = 'f0790f0b6da44120e1c6c4bc8bcb72bb';
+        const BANNER_320_SRC = 'https://bicea.org/22/f0790f0b6da44120e1c6c4bc8bcb72bb';
+
+        const BANNER_300_KEY = '4dfb9a5937a21eac92dacd7d5199d46c';
+        const BANNER_300_SRC = 'https://bicea.org/22/4dfb9a5937a21eac92dacd7d5199d46c';
+
+        injectAdsterraBanner(document.getElementById('topAdSlot'), 728, 90, BANNER_728_KEY, BANNER_728_SRC);
+        injectAdsterraBanner(document.getElementById('profileTopAdSlot'), 728, 90, BANNER_728_KEY, BANNER_728_SRC);
 
         function filterCategory(category, btn) {
             currentFilter = category;
@@ -758,7 +736,18 @@
         function triggerAdBeforePublish() {
             const titleInput = document.getElementById('photoTitleInput');
             const fileInput = document.getElementById('photoFileInput');
+            const remainingMs = getRemainingCooldownMs();
+            const recentCount = getRecentPublishCount();
+            const dailyLimit = getDailyLimit();
 
+            if (remainingMs > 0) {
+                alert(`Debes esperar 1 hora entre publicaciones. Tiempo restante: ${formatRemainingTime(remainingMs)}.`);
+                return;
+            }
+            if (recentCount >= dailyLimit) {
+                alert(`Ya alcanzaste tu límite de ${dailyLimit} fotos por día.`);
+                return;
+            }
             if (!titleInput.value.trim()) {
                 alert('Escribe un título para la fotografía.');
                 return;
@@ -780,7 +769,7 @@
             modal.classList.add('open');
 
             const adContainer = document.getElementById('ad300x250Container');
-            injectAdsterraBanner(adContainer, 300, 250);
+            injectAdsterraBanner(adContainer, 300, 250, BANNER_300_KEY, BANNER_300_SRC);
 
             let timeLeft = 30;
             const timerDisplay = document.getElementById('adTimerDisplay');
@@ -819,10 +808,10 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const photoPlanType = checkIsVIP() ? 'membresia' : 'gratis';
-                const photoId = 'PHOTO_' + Date.now() + '_' + photoPlanType;
+                const now = Date.now();
 
                 photosData.unshift({
-                    id: photoId,
+                    id: 'PHOTO_' + now + '_' + photoPlanType,
                     title: titleInput.value.trim(),
                     category: catInput.value,
                     likes: 0,
@@ -830,22 +819,18 @@
                     imgSrc: e.target.result
                 });
 
+                lastPublishTime = now;
+                publishTimestamps.push(now);
+                saveUserState();
+
                 titleInput.value = '';
                 fileInput.value = '';
+                updateUIState();
                 renderFeed();
                 switchView('feed');
-                alert('¡Fotografía publicada en el feed!');
+                alert('¡Fotografía publicada!');
             };
             reader.readAsDataURL(fileInput.files[0]);
-        }
-
-        function createWatermarkHTML() {
-            return `
-                <div class="watermark-overlay">
-                    <div class="watermark-text">PHOTOCLICK</div>
-                    <div class="watermark-text">PHOTOCLICK</div>
-                </div>
-            `;
         }
 
         function renderFeed() {
@@ -865,7 +850,6 @@
                 card.innerHTML = `
                     <div class="photo-container">
                         <img src="${photo.imgSrc}" alt="${photo.title}">
-                        ${createWatermarkHTML()}
                     </div>
                     <div class="photo-info">
                         <span class="photo-title">${photo.title}</span>
@@ -874,10 +858,11 @@
                 `;
                 container.appendChild(card);
 
+                // Cada 3 filas en grid de 2 columnas = cada 6 fotos
                 if ((index + 1) % 6 === 0) {
                     const adDiv = document.createElement('div');
                     adDiv.className = 'feed-ad-container';
-                    injectAdsterraBanner(adDiv, 728, 90);
+                    injectAdsterraBanner(adDiv, 728, 90, BANNER_728_KEY, BANNER_728_SRC);
                     container.appendChild(adDiv);
                 }
             });
@@ -887,14 +872,11 @@
             currentModalIndex = index;
             const photo = photosData[index];
             const imgBox = document.getElementById('modalImageContainer');
-            imgBox.innerHTML = `
-                <img src="${photo.imgSrc}" alt="${photo.title}">
-                ${createWatermarkHTML()}
-            `;
+            imgBox.innerHTML = `<img src="${photo.imgSrc}" alt="${photo.title}">`;
 
             document.getElementById('modalPhotoTitle').textContent = photo.title;
             document.getElementById('modalLikeCount').textContent = photo.likes;
-            injectAdsterraBanner(document.getElementById('modalAdSlot'), 320, 50);
+            injectAdsterraBanner(document.getElementById('modalAdSlot'), 320, 50, BANNER_320_KEY, BANNER_320_SRC);
             document.getElementById('photoModal').classList.add('open');
         }
 
@@ -913,10 +895,6 @@
                 saveUserState();
                 updateUIState();
                 renderFeed();
-
-                if (photo.likes % 500 === 0) {
-                    alert(`¡La foto "${photo.title}" completó ${photo.likes} likes ($0.05 acumulados en su ciclo)!`);
-                }
             }
         }
 
@@ -925,7 +903,7 @@
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(url).then(() => alert('Enlace copiado.'));
             } else {
-                alert('Enlace listo para compartir: ' + url);
+                alert('Enlace: ' + url);
             }
         }
 
@@ -943,6 +921,7 @@
             window.scrollTo(0, 0);
         }
 
+        setInterval(updateUIState, 1000);
         updateUIState();
         renderFeed();
     </script>
